@@ -154,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_navAgent: {fileID: 2840715968679227705}
   m_pickUpTrigger: {fileID: 2840715968869899756}
+  debugRenderer: {fileID: 2840715967145106671}
 --- !u!1 &2840715968869899755
 GameObject:
   m_ObjectHideFlags: 0
