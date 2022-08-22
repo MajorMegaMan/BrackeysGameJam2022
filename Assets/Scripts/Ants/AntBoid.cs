@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class AntBoid : MonoBehaviour
 {
@@ -20,17 +21,22 @@ public class AntBoid : MonoBehaviour
     // Building
     AntBuildingGroup m_currentBuildGroup = null;
     Vector3 m_climbPosition = Vector3.zero;
+    [SerializeField] Collider m_frozenCollider = null;
 
     // Getters
     PlayerController player { get { return AntManager.instance.player; } }
     AntSettings settings { get { return AntManager.instance.settings; } }
+
+    public float speed { get { return m_navAgent.speed; } }
+    public Vector3 velocity { get { return m_navAgent.velocity; } }
+    public float currentSpeed { get { return m_navAgent.velocity.magnitude; } }
 
     [SerializeField] MeshRenderer debugRenderer = null;
     Material debugMaterial { get; set; }
 
     private void Awake()
     {
-
+        m_frozenCollider.gameObject.SetActive(false);
     }
 
     // Start is called before the first frame update
@@ -57,12 +63,6 @@ public class AntBoid : MonoBehaviour
     public void PlayerDropTriggerEvent()
     {
         SetState(StateEnum.empty);
-    }
-
-    public void SendToBuildCell(GridManager.GridCellKey gridCellKey)
-    {
-        SetNavTarget(GameManager.instance.gridManager.GetCellFloorPosition(gridCellKey));
-        SetState(StateEnum.buildMove);
     }
 
     public void SetBuildGroup(AntBuildingGroup antBuildingGroup)
@@ -322,6 +322,7 @@ public class AntBoid : MonoBehaviour
         {
             Debug.Log("Freeze");
             owner.StopNavigating();
+            owner.m_frozenCollider.gameObject.SetActive(true);
             if(owner.m_currentBuildGroup != null)
             {
                 owner.m_currentBuildGroup.FreezeAnt(owner);
@@ -332,7 +333,7 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
-
+            owner.m_frozenCollider.gameObject.SetActive(false);
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)

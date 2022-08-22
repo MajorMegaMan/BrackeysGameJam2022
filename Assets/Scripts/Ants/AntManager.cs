@@ -46,26 +46,14 @@ public class AntManager : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ClearBuildGroups()
     {
-        if(Input.GetMouseButtonDown(1))
+        for (int i = 0; i < m_buildGroups.Count; i++)
         {
-            for(int i = 0; i < m_buildGroups.Count; i++)
-            {
-                var group = m_buildGroups[i];
-                group.Dissassemble();
-            }
-            m_buildGroups.Clear();
+            var group = m_buildGroups[i];
+            group.Dissassemble();
         }
-    }
-
-    public void DebugClearBuildAnts()
-    {
-        while(m_playerBuildingAnts.Count != 0)
-        {
-            m_playerBuildingAnts[0].PlayerDropTriggerEvent();
-        }
+        m_buildGroups.Clear();
     }
 
     public int AvailableAntCount()

@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            AntManager.instance.DebugClearBuildAnts();
+            AntManager.instance.ClearBuildGroups();
         }
 
         if(Input.GetMouseButtonDown(0))
@@ -89,23 +89,5 @@ public class GameManager : MonoBehaviour
     public void InitiateAntBuild(Vector3 start, Vector3 end)
     {
         AntManager.instance.InitiateLineBuild(start, end);
-    }
-
-    public void DebugSendAntToBuild(Vector3 position)
-    {
-        AntBoid ant = AntManager.instance.GetAvailableAnt();
-        if(ant != null)
-        {
-            var cellKey = m_gridManager.GetCellKey(position);
-            if(m_gridManager.TryGetCellObject(cellKey, out GridManager.GridCellObject gridCellObject))
-            {
-                // Tile is occupied
-            }
-            else
-            {
-                // Tile is unoccupied
-                ant.SendToBuildCell(cellKey);
-            }
-        }
     }
 }
