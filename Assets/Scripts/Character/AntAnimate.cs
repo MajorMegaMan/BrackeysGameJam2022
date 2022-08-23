@@ -9,9 +9,21 @@ public class AntAnimate : MonoBehaviour
 
     [SerializeField] Transform m_modelTransform = null;
 
+    [SerializeField] float m_normalisedTransitionTime = 0.05f;
+
     void Start()
     {
 
+    }
+
+    public void Motion()
+    {
+        m_characterAnimate.CrossFade(0, m_normalisedTransitionTime);
+    }
+
+    public void Climb()
+    {
+        m_characterAnimate.CrossFade(1, m_normalisedTransitionTime);
     }
 
     // Update is called once per frame

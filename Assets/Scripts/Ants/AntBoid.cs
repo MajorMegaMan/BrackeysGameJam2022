@@ -14,14 +14,25 @@ public class AntBoid : MonoBehaviour
 
     StateMachine<AntBoid> m_actionStateMachine;
     IState<AntBoid>[] m_actionStates;
+    StateEnum m_currentState = 0;
 
     // Gameplay
     [SerializeField] PickUpTrigger m_pickUpTrigger = null;
+    [SerializeField] CollisionTrigger m_collisionTrigger = null;
 
     // Building
     AntBuildingGroup m_currentBuildGroup = null;
     Vector3 m_climbPosition = Vector3.zero;
     [SerializeField] Collider m_frozenCollider = null;
+
+    // Carrying
+    CarryableObject m_currentCarryableObject = null;
+    int m_carryPositionIndex = 0;
+    bool m_isHolding = false;
+
+    // Animation
+    [SerializeField] AntAnimate m_antAnimator = null;
+    [SerializeField] RagdollAnimator m_ragdoll = null;
 
     // Getters
     PlayerController player { get { return AntManager.instance.player; } }
@@ -30,9 +41,6 @@ public class AntBoid : MonoBehaviour
     public float speed { get { return m_navAgent.speed; } }
     public Vector3 velocity { get { return m_navAgent.velocity; } }
     public float currentSpeed { get { return m_navAgent.velocity.magnitude; } }
-
-    [SerializeField] MeshRenderer debugRenderer = null;
-    Material debugMaterial { get; set; }
 
     private void Awake()
     {
@@ -44,7 +52,16 @@ public class AntBoid : MonoBehaviour
     {
         InitialiseStateMachine();
 
-        debugMaterial = debugRenderer.material;
+        AntManager.instance.AddToAllAnts(this);
+    }
+
+    private void OnDestroy()
+    {
+        var manager = AntManager.instance;
+        if(manager != null)
+        {
+            AntManager.instance.RemoveFromAllAnts(this);
+        }
     }
 
     // Update is called once per frame
@@ -60,7 +77,7 @@ public class AntBoid : MonoBehaviour
     }
 
     // Should be called when the player does not "own" the ant anymore
-    public void PlayerDropTriggerEvent()
+    public void SetToWait()
     {
         SetState(StateEnum.empty);
     }
@@ -71,8 +88,6 @@ public class AntBoid : MonoBehaviour
 
         if(m_currentBuildGroup != null)
         {
-            debugMaterial.color = Color.red;
-
             m_currentBuildGroup.AddAntToGroup(this);
 
             SetNavTarget(antBuildingGroup.start);
@@ -80,8 +95,14 @@ public class AntBoid : MonoBehaviour
         }
         else
         {
-            debugMaterial.color = Color.white;
-            SetState(StateEnum.empty);
+            if(m_currentState == StateEnum.climbing || m_currentState == StateEnum.frozen)
+            {
+                SetState(StateEnum.ragdoll);
+            }
+            else
+            {
+                SetState(StateEnum.empty);
+            }
         }
     }
 
@@ -89,6 +110,43 @@ public class AntBoid : MonoBehaviour
     {
         m_climbPosition = climbPosiiton;
         SetState(StateEnum.climbing);
+    }
+
+    public void ActivateRagdoll()
+    {
+        SetState(StateEnum.ragdoll);
+    }
+
+    public void CarryObject(CarryableObject carryableObject, int positionIndex)
+    {
+        SetCarriableObject(carryableObject, positionIndex);
+        SetState(StateEnum.carryMove);
+    }
+
+    void SetCarriableObject(CarryableObject carryableObject, int positionIndex)
+    {
+        if (m_currentCarryableObject != null)
+        {
+            m_currentCarryableObject.RemoveAnt(this);
+        }
+
+        m_currentCarryableObject = carryableObject;
+        m_carryPositionIndex = positionIndex;
+
+        if (m_currentCarryableObject != null)
+        {
+            m_currentCarryableObject.AddAnt(this);
+        }
+    }
+
+    public void OnCollisionTrigger(Collider other)
+    {
+        var otherRigid = other.GetComponent<Rigidbody>();
+        if(otherRigid != null)
+        {
+            ActivateRagdoll();
+            m_ragdoll.GetRigidbody(0).AddForce(otherRigid.velocity, ForceMode.Impulse);
+        }
     }
 
     #region Navigation
@@ -132,6 +190,7 @@ public class AntBoid : MonoBehaviour
 
     void SetState(StateEnum stateEnum)
     {
+        m_currentState = stateEnum;
         m_actionStateMachine.SetState(m_actionStates[(int)stateEnum]);
     }
 
@@ -141,18 +200,12 @@ public class AntBoid : MonoBehaviour
         m_pickUpTrigger.gameObject.SetActive(true);
         SetFollowTarget(null);
         SetNavTarget(transform.position);
-
-        AntManager.instance.RemoveFromPlayerGroup(this);
-        AntManager.instance.RemoveFromBuildAnts(this);
     }
 
     internal void EnterFollowing()
     {
         m_pickUpTrigger.gameObject.SetActive(false);
         SetFollowTarget(player.transform);
-
-        AntManager.instance.AddToPlayerGroup(this);
-        AntManager.instance.RemoveFromBuildAnts(this);
     }
 
     internal void EnterBuilding()
@@ -160,10 +213,21 @@ public class AntBoid : MonoBehaviour
         m_pickUpTrigger.gameObject.SetActive(false);
         SetFollowTarget(null);
         m_navAgent.SetDestination(m_navTarget);
-
-        AntManager.instance.RemoveFromPlayerGroup(this);
-        AntManager.instance.AddToBuildAnts(this);
     }
+
+    internal void EnterCarryMove()
+    {
+        SetNavTarget(m_currentCarryableObject.GetAntPosition(m_carryPositionIndex));
+        m_navAgent.SetDestination(m_navTarget);
+    }
+
+    internal void EnterCarryHold()
+    {
+        StopNavigating();
+        transform.forward = m_currentCarryableObject.GetAntCentre() - transform.position;
+        m_currentCarryableObject.AntArrived(this);
+    }
+
     #endregion // !StatesInternals
 
     void InitialiseStateMachine()
@@ -177,6 +241,11 @@ public class AntBoid : MonoBehaviour
         m_actionStates[(int)StateEnum.buildWait] = new BuildingWaitState();
         m_actionStates[(int)StateEnum.climbing] = new ClimbingState();
         m_actionStates[(int)StateEnum.frozen] = new FrozenState();
+        m_actionStates[(int)StateEnum.ragdoll] = new RagdollState();
+        m_actionStates[(int)StateEnum.carryMove] = new CarryMoveState();
+        m_actionStates[(int)StateEnum.carryHold] = new CarryHoldState();
+
+        m_currentState = StateEnum.empty;
 
         // This function must be called after awake as the ant manager needs to be initialised.
         m_actionStateMachine.InitialiseState(m_actionStates[(int)StateEnum.empty]);
@@ -189,7 +258,10 @@ public class AntBoid : MonoBehaviour
         buildMove,
         buildWait,
         climbing,
-        frozen
+        frozen,
+        ragdoll,
+        carryMove,
+        carryHold
     }
 
     class EmptyState : IState<AntBoid>
@@ -217,11 +289,13 @@ public class AntBoid : MonoBehaviour
         {
             owner.StartNavigating();
             owner.EnterFollowing();
+
+            AntManager.instance.AddToPlayerGroup(owner);
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
-
+            AntManager.instance.RemoveFromPlayerGroup(owner);
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -232,19 +306,15 @@ public class AntBoid : MonoBehaviour
 
     class BuildingMoveState : IState<AntBoid>
     {
-        GridManager.GridCellKey m_currentCellKey;
-
         void IState<AntBoid>.Enter(AntBoid owner)
         {
             owner.StartNavigating();
-            m_currentCellKey = GameManager.instance.gridManager.GetCellKey(owner.m_navTarget);
-            //GameManager.instance.gridManager.AddGridCellObject(m_currentCellKey, owner);
             owner.EnterBuilding();
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
-            //GameManager.instance.gridManager.RemoveGridCellObject(m_currentCellKey);
+            
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -262,7 +332,7 @@ public class AntBoid : MonoBehaviour
     {
         void IState<AntBoid>.Enter(AntBoid owner)
         {
-            owner.debugMaterial.color = Color.blue;
+            
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
@@ -282,15 +352,15 @@ public class AntBoid : MonoBehaviour
         {
             owner.StopNavigating();
 
-            owner.debugMaterial.color = Color.yellow;
-
             Vector3 lineDir = owner.m_currentBuildGroup.GetLine().normalized;
             owner.transform.up = lineDir;
+
+            owner.m_antAnimator.Climb();
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
-            
+            owner.m_antAnimator.Motion();
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -300,7 +370,7 @@ public class AntBoid : MonoBehaviour
 
             float deltaMagnitude = owner.settings.climbSpeed * Time.deltaTime;
 
-            if (remain < 0.001f)
+            if (remain < owner.settings.climbFinishDistance)
             {
                 // arrived
                 Debug.Log("Climbing Arrived");
@@ -327,8 +397,6 @@ public class AntBoid : MonoBehaviour
             {
                 owner.m_currentBuildGroup.FreezeAnt(owner);
             }
-
-            owner.debugMaterial.color = Color.green;
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
@@ -339,6 +407,101 @@ public class AntBoid : MonoBehaviour
         void IState<AntBoid>.Invoke(AntBoid owner)
         {
 
+        }
+    }
+
+    class RagdollState : IState<AntBoid>
+    {
+        Rigidbody m_hips = null;
+        Transform m_hipsTransform = null;
+        Vector3 m_hipsOffset = Vector3.zero;
+
+        float m_timer = 0.0f;
+
+        void IState<AntBoid>.Enter(AntBoid owner)
+        {
+            owner.StopNavigating();
+            owner.m_ragdoll.Activate(true);
+
+            m_hips = owner.m_ragdoll.GetRigidbody(0);
+            m_hipsTransform = m_hips.transform;
+
+            m_hipsOffset = m_hipsTransform.position - owner.transform.position;
+
+            m_timer = 0.0f;
+
+            owner.m_collisionTrigger.gameObject.SetActive(false);
+
+            if(owner.m_currentBuildGroup != null)
+            {
+                owner.m_currentBuildGroup.Dissassemble();
+            }
+        }
+
+        void IState<AntBoid>.Exit(AntBoid owner)
+        {
+            owner.m_ragdoll.Activate(false);
+            //Vector3 offset = m_hipsTransform.localToWorldMatrix * m_hipsOffset;
+            //owner.transform.position = m_hipsTransform.position + offset;
+            owner.transform.position = m_hipsTransform.position;
+
+            owner.m_collisionTrigger.gameObject.SetActive(true);
+        }
+
+        void IState<AntBoid>.Invoke(AntBoid owner)
+        {
+            if(m_hips.velocity.magnitude < owner.settings.ragdollMinSpeedThreshold)
+            {
+                m_timer += Time.deltaTime;
+                if (m_timer > owner.settings.ragdollRestTime)
+                {
+                    owner.SetState(StateEnum.empty);
+                }
+            }
+        }
+    }
+
+    class CarryMoveState : IState<AntBoid>
+    {
+        void IState<AntBoid>.Enter(AntBoid owner)
+        {
+            owner.EnterCarryMove();
+        }
+
+        void IState<AntBoid>.Exit(AntBoid owner)
+        {
+            // Test the next state that the ant is moving into.
+            if(owner.m_currentState != StateEnum.carryHold)
+            {
+                owner.SetCarriableObject(null, -1);
+            }
+        }
+
+        void IState<AntBoid>.Invoke(AntBoid owner)
+        {
+            if(owner.m_navAgent.remainingDistance < owner.settings.carrySnapDistance)
+            {
+                owner.transform.position = owner.m_navTarget;
+                owner.SetState(StateEnum.carryHold);
+            }
+        }
+    }
+
+    class CarryHoldState : IState<AntBoid>
+    {
+        void IState<AntBoid>.Enter(AntBoid owner)
+        {
+            owner.EnterCarryHold();
+        }
+
+        void IState<AntBoid>.Exit(AntBoid owner)
+        {
+            owner.SetCarriableObject(null, -1);
+        }
+
+        void IState<AntBoid>.Invoke(AntBoid owner)
+        {
+            owner.transform.position = owner.m_currentCarryableObject.GetAntPosition(owner.m_carryPositionIndex);
         }
     }
 

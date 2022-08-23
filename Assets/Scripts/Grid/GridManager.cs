@@ -9,6 +9,8 @@ public class GridManager : MonoBehaviour
 
     Dictionary<GridCellKey, GridCellObject> m_blockedCells = null;
 
+    public float cellSize { get { return m_cellSize; } }
+
     private void Awake()
     {
         m_blockedCells = new Dictionary<GridCellKey, GridCellObject>();

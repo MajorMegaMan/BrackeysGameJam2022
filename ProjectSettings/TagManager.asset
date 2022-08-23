@@ -14,7 +14,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - CarryObject
   - 
   - 
   - 
@@ -23,9 +23,9 @@ TagManager:
   - 
   - Player
   - Ant
-  - 
-  - 
-  - 
+  - FrozenAnt
+  - CollisionTrigger
+  - AntRagdoll
   - 
   - 
   - 

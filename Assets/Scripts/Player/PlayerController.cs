@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float m_gravity = Physics.gravity.y;
     [SerializeField] LayerMask m_groundLayer = ~0;
 
+    Vector3 m_groundNormal = Vector3.up;
+
     float m_verticalVelocity = 0.0f;
 
     public float speed { get { return m_speed; } }
@@ -37,6 +39,7 @@ public class PlayerController : MonoBehaviour
     {
         GetInputs();
 
+        bool isGrounded = false;
         if(!CheckForGround(out RaycastHit hitInfo))
         {
             m_verticalVelocity += m_gravity * Time.deltaTime;
@@ -44,9 +47,17 @@ public class PlayerController : MonoBehaviour
         else
         {
             m_verticalVelocity = 0.0f;
+            m_groundNormal = hitInfo.normal;
+            isGrounded = true;
         }
 
-        m_velocity = m_moveInput * m_speed;
+        Vector3 moveDir = m_moveInput;
+        if (isGrounded)
+        {
+            moveDir = Vector3.ProjectOnPlane(moveDir, m_groundNormal);
+        }
+
+        m_velocity = moveDir * m_speed;
 
         Vector3 moveVector = m_velocity + Vector3.up * m_verticalVelocity;
         m_currentSpeed = m_velocity.magnitude;
