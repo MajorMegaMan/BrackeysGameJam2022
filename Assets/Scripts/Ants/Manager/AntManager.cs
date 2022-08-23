@@ -8,9 +8,10 @@ public class AntManager : MonoBehaviour
     public PlayerController m_player = null;
 
     List<AntBoid> m_playerGroupedAnts = null;
-    List<AntBoid> m_playerBuildingAnts = null;
 
     List<AntBuildingGroup> m_buildGroups = null;
+
+    List<AntBoid> m_allAnts = null;
 
     public AntSettings settings { get { return m_settings; } }
     public PlayerController player { get { return m_player; } }
@@ -27,8 +28,8 @@ public class AntManager : MonoBehaviour
         }
         _instance = this;
 
+        m_allAnts = new List<AntBoid>();
         m_playerGroupedAnts = new List<AntBoid>();
-        m_playerBuildingAnts = new List<AntBoid>();
         m_buildGroups = new List<AntBuildingGroup>();
     }
 
@@ -44,6 +45,14 @@ public class AntManager : MonoBehaviour
     void Start()
     {
         
+    }
+
+    public void ReleaseAllAnts()
+    {
+        for(int i = 0; i < m_allAnts.Count; i++)
+        {
+            m_allAnts[i].SetToWait();
+        }
     }
 
     public void ClearBuildGroups()
@@ -96,6 +105,21 @@ public class AntManager : MonoBehaviour
         return (int)Mathf.Ceil(lineLength);
     }
 
+    public void SendGroupToCarryObject(CarryableObject carryableObject, Vector3 targetCarryPosition, Quaternion targetCarryRotation)
+    {
+        int antCount = carryableObject.antStrengthCount;
+        if (AvailableAntCount() >= antCount)
+        {
+            // Can send ants to pick up an object
+            carryableObject.MoveToLocation(targetCarryPosition, targetCarryRotation);
+            for(int i = 0; i < antCount; i++)
+            {
+                var ant = GetAvailableAnt();
+                ant.CarryObject(carryableObject, i);
+            }
+        }
+    }
+
     #region AntListManagement
     public void AddToPlayerGroup(AntBoid antBoid)
     {
@@ -107,14 +131,14 @@ public class AntManager : MonoBehaviour
         m_playerGroupedAnts.Remove(antBoid);
     }
 
-    public void AddToBuildAnts(AntBoid antBoid)
+    public void AddToAllAnts(AntBoid antBoid)
     {
-        m_playerBuildingAnts.Add(antBoid);
+        m_allAnts.Add(antBoid);
     }
 
-    public void RemoveFromBuildAnts(AntBoid antBoid)
+    public void RemoveFromAllAnts(AntBoid antBoid)
     {
-        m_playerBuildingAnts.Remove(antBoid);
+        m_allAnts.Remove(antBoid);
     }
     #endregion // !AntListManagement
 

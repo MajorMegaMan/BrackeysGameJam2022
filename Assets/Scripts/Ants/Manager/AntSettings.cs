@@ -30,6 +30,9 @@ public class AntSettings : ScriptableObject
     [SerializeField] float m_ragdollRestTime = 2.0f;
     [SerializeField] float m_ragdollMinSpeedThreshold = 0.05f;
 
+    [Header("Carry Variables")]
+    [SerializeField] float m_carrySnapDistance = 0.1f;
+
     public float pickUpRadius { get { return m_pickUpRadius; } }
     public float followDistance { get { return m_followDistance; } }
     public float singleBuildHeight { get { return m_singleBuildHeight; } }
@@ -39,4 +42,5 @@ public class AntSettings : ScriptableObject
     public float climbFinishDistance { get { return m_climbSnapDistance; } }
     public float ragdollRestTime { get { return m_ragdollRestTime; } }
     public float ragdollMinSpeedThreshold { get { return m_ragdollMinSpeedThreshold; } }
+    public float carrySnapDistance { get { return m_carrySnapDistance; } }
 }
