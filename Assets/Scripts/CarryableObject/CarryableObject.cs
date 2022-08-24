@@ -27,6 +27,11 @@ public class CarryableObject : MonoBehaviour
 
     public int antStrengthCount { get { return m_antStrengthCount; } }
 
+    // navagent variable getters
+    public float speed { get { return m_navAgent.speed; } }
+    public Vector3 velocity { get { return m_navAgent.velocity; } }
+    public float currentSpeed { get { return m_navAgent.velocity.magnitude; } }
+
     private void Awake()
     {
         m_currentAntGroup = new List<AntBoid>(m_antStrengthCount);
@@ -81,7 +86,14 @@ public class CarryableObject : MonoBehaviour
     {
         Vector3 dir = CalculateMountingDirection(positionCount);
         Vector3 closestPoint = m_spaceCollider.ClosestPoint(transform.position + dir * m_directionSearchMultiplier);
-        return closestPoint + dir * m_antDistanceOffset + Vector3.up * m_antHeightOffset;
+        Vector3 surroundingPoint = closestPoint + dir * m_antDistanceOffset + Vector3.up * m_antHeightOffset;
+
+        Vector3 result = surroundingPoint;
+        if(NavMesh.SamplePosition(surroundingPoint, out NavMeshHit navMeshHit, 2.0f, ~0))
+        {
+            result = navMeshHit.position;
+        }
+        return result;
     }
 
     public Vector3 GetAntCentre()

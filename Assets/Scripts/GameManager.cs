@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
         Vector3 halfOffset = Vector3.one * m_gridManager.cellSize * 0.5f;
 
         mouseHighlightPosition.y -= scale.y * 0.5f;
-        mouseHighlightPosition.y += halfOffset.y;
+        mouseHighlightPosition.y += scale.y - halfOffset.y;
 
         if (!IsOdd((int)scale.x))
         {

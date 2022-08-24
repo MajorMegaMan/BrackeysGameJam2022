@@ -16,7 +16,9 @@ MonoBehaviour:
   m_followDistance: 2
   m_singleBuildHeight: 2
   m_buildArrivedistance: 1
-  m_climbSpeed: 3
   m_buildRotationSpeed: 5
+  m_climbSpeed: 3
+  m_climbSnapDistance: 0.05
   m_ragdollRestTime: 2
   m_ragdollMinSpeedThreshold: 0.2
+  m_carrySnapDistance: 0.15
