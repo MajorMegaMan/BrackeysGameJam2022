@@ -6,6 +6,10 @@ public class CameraSpin : MonoBehaviour
 {
     [SerializeField] float m_camSpeed = 1.0f;
 
+    Vector3 m_moveSmooth = Vector3.zero;
+    Vector3 m_moveSmoothVel = Vector3.zero;
+    [SerializeField] float m_moveSmoothTime = 0.1f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,7 +27,10 @@ public class CameraSpin : MonoBehaviour
 
             Vector3 moveDir = transform.right * mouseInput.x * m_camSpeed;
             moveDir += transform.up * mouseInput.y * m_camSpeed;
-            transform.position += moveDir;
+
+            m_moveSmooth = Vector3.SmoothDamp(m_moveSmooth, moveDir, ref m_moveSmoothVel, m_moveSmoothTime);
+
+            transform.position += m_moveSmooth;
         }
     }
 }

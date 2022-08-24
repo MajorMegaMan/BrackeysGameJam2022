@@ -168,9 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_followTarget: {fileID: 1910519987}
-  m_splitFollow:
-  - {fileID: 1632441291}
+  m_splitFollow: {fileID: 1632441291}
   m_modeIsSingle: 1
+  splitLerpAmount: 0.5
 --- !u!1 &93378482
 GameObject:
   m_ObjectHideFlags: 0
@@ -1947,7 +1947,7 @@ GameObject:
   - component: {fileID: 1315022432}
   - component: {fileID: 1315022433}
   m_Layer: 9
-  m_Name: Cube
+  m_Name: CarryableObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2241,13 +2241,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_gridManager: {fileID: 629150597}
-  m_raySelector: {fileID: 1351510358}
-  m_lineTool: {fileID: 647297858}
   debugLineAntCount: 0
-  m_mouseHighlightObject: {fileID: 1632441291}
-  m_carryObjectLayerMask:
-    serializedVersion: 2
-    m_Bits: 512
+  m_camLookTarget: {fileID: 63665759}
+  m_regularCamLerp: 0.1
+  m_drawingCamLerp: 0.5
+  m_mouseIndicator: {fileID: 1632441295}
 --- !u!1 &1514224521
 GameObject:
   m_ObjectHideFlags: 0
@@ -2446,7 +2444,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookTarget: {fileID: 63665758}
   targetFollow: {fileID: 1910519987}
-  distance: 8
+  distance: 5
   m_smoothPosTime: 0.1
   m_smoothLookTime: 0.1
   m_maxHeight: 3
@@ -2497,6 +2495,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_camSpeed: 1
+  m_moveSmoothTime: 0.1
 --- !u!1 &1632441290
 GameObject:
   m_ObjectHideFlags: 0
@@ -2508,6 +2507,7 @@ GameObject:
   - component: {fileID: 1632441291}
   - component: {fileID: 1632441294}
   - component: {fileID: 1632441293}
+  - component: {fileID: 1632441295}
   m_Layer: 0
   m_Name: MouseIndicator
   m_TagString: Untagged
@@ -2580,6 +2580,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1632441290}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1632441295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632441290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b0e519abf36e04fbf67f907e9a5ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_gridManager: {fileID: 629150597}
+  m_raySelector: {fileID: 1351510358}
+  m_lineTool: {fileID: 647297858}
+  m_selectorDistance: 5
+  m_carryObjectLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  m_meshRenderer: {fileID: 1632441293}
+  m_validColour: {r: 0, g: 1, b: 0, a: 1}
+  m_invalidColour: {r: 1, g: 0, b: 0, a: 1}
+  m_coverSkinWidth: 0.1
 --- !u!1 &1691212115
 GameObject:
   m_ObjectHideFlags: 0

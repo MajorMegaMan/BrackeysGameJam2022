@@ -5,22 +5,19 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] GridManager m_gridManager = null;
-    [SerializeField] RaySelector m_raySelector = null;
-    [SerializeField] BuildLineTool m_lineTool = null;
 
     [SerializeField] int debugLineAntCount = 0;
 
     PackagedStateMachine<GameManager> m_selectionStateMachine;
 
+    // CameraRelated
+    [SerializeField] CamLookTarget m_camLookTarget = null;
+    [SerializeField] float m_regularCamLerp = 0.1f;
+    [SerializeField] float m_drawingCamLerp = 0.5f;
+
+    [SerializeField] MouseIndicator m_mouseIndicator = null;
+
     // Selection StateLogic
-    [SerializeField] Transform m_mouseHighlightObject = null;
-    [SerializeField] LayerMask m_carryObjectLayerMask = 0;
-
-    Collider m_lastHitCollider = null;
-    Vector3 m_lastHitpoint = Vector3.zero;
-    GridManager.GridCellKey m_lastCellKey;
-    Vector3 m_lastCellPosition = Vector3.zero;
-
     // Carry Hover
     CarryableObject m_carryableObject = null;
     Collider m_hoverCollider = null;
@@ -54,12 +51,13 @@ public class GameManager : MonoBehaviour
     void Initialise()
     {
         InitialiseStateMachine();
+        m_camLookTarget.SetMode(false);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        m_lineTool.HideLine();
+        m_mouseIndicator.FinishDrawLine();
     }
 
     // Update is called once per frame
@@ -75,7 +73,7 @@ public class GameManager : MonoBehaviour
             AntManager.instance.ReleaseAllAnts();
         }
 
-        if (CamRayCast())
+        if (m_mouseIndicator.CamRayCast())
         {
             m_selectionStateMachine.Invoke();
         }
@@ -84,52 +82,6 @@ public class GameManager : MonoBehaviour
     public void InitiateAntBuild(Vector3 start, Vector3 end)
     {
         AntManager.instance.InitiateLineBuild(start, end);
-    }
-
-    public bool CamRayCast()
-    {
-        bool hit = m_raySelector.CamRayCast(out Ray camRay, out RaycastHit hitInfo);
-        m_lastHitCollider = hitInfo.collider;
-        m_lastHitpoint = hitInfo.point - camRay.direction * m_raySelector.raySkin;
-
-        m_lastCellKey = m_gridManager.GetCellKey(m_lastHitpoint);
-        m_lastCellPosition = m_gridManager.GetCellPosition(m_lastCellKey);
-
-        Vector3 mouseHighlightPosition = m_lastCellPosition;
-        Vector3 scale = m_mouseHighlightObject.localScale;
-        Vector3 halfOffset = Vector3.one * m_gridManager.cellSize * 0.5f;
-
-        mouseHighlightPosition.y -= scale.y * 0.5f;
-        mouseHighlightPosition.y += scale.y - halfOffset.y;
-
-        if (!IsOdd((int)scale.x))
-        {
-            mouseHighlightPosition.x += -Mathf.Sign(Vector3.Dot(Camera.main.transform.forward, Vector3.forward)) * halfOffset.x;
-        }
-
-        if (!IsOdd((int)scale.z))
-        {
-            mouseHighlightPosition.z += -Mathf.Sign(Vector3.Dot(Camera.main.transform.right, Vector3.right)) * halfOffset.z;
-        }
-
-        m_mouseHighlightObject.position = mouseHighlightPosition;
-
-        return hit;
-    }
-
-    bool IsOdd(int number)
-    {
-        return number % 2 != 0;
-    }
-
-    void SetSelectorScale(Vector3 scale)
-    {
-        m_mouseHighlightObject.localScale = scale;
-    }
-
-    void SetSelectorScaleToGridCellSize()
-    {
-        m_mouseHighlightObject.localScale = Vector3.one * m_gridManager.cellSize;
     }
 
     #region SelectionStates
@@ -147,35 +99,32 @@ public class GameManager : MonoBehaviour
 
     void EnterDrawing()
     {
-        m_mouseHighlightObject.gameObject.SetActive(true);
+        m_mouseIndicator.StartDrawLine();
 
-        //Vector3 cellFloorPos = m_gridManager.GetCellFloorPosition(m_lastCellKey);
-        m_lineTool.SetStart(m_lastCellPosition);
-        m_lineTool.SetEnd(m_lastCellPosition + Vector3.up * 0.001f);
-        m_lineTool.ShowLine();
+        m_camLookTarget.splitLerpAmount = m_drawingCamLerp;
     }
 
     void ExitDrawing()
     {
-        m_lineTool.SetEnd(m_lastCellPosition);
+        m_mouseIndicator.FinishDrawLine();
 
         // Send ants to build with this line
-        InitiateAntBuild(m_lineTool.GetStart(), m_lastCellPosition);
+        InitiateAntBuild(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
 
-        m_lineTool.HideLine();
+        //m_camLookTarget.SetMode(true);
+        m_camLookTarget.splitLerpAmount = m_regularCamLerp;
     }
 
     void InvokeDrawLine()
     {
-        m_lineTool.SetEnd(m_lastCellPosition);
+        m_mouseIndicator.SetEndDrawLine();
 
-        debugLineAntCount = AntManager.instance.CalculateLineAntCount(m_lineTool.GetStart(), m_lineTool.GetEnd());
+        debugLineAntCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
     }
 
     void EnterHover()
     {
-        m_mouseHighlightObject.gameObject.SetActive(false);
-        m_hoverCollider = m_lastHitCollider;
+        m_hoverCollider = m_mouseIndicator.lastHitCollider;
         m_carryableObject = m_hoverCollider.GetComponent<CarryableObject>();
     }
 
@@ -183,6 +132,7 @@ public class GameManager : MonoBehaviour
     {
         if(m_selectionStateMachine.GetCurrentState() != SelectionStateEnum.drawCarryObject)
         {
+            m_mouseIndicator.SetSelectorScaleToGridCellSize();
             m_hoverCollider = null;
             m_carryableObject = null;
         }
@@ -190,11 +140,13 @@ public class GameManager : MonoBehaviour
 
     void InvokeHover()
     {
-        if (m_lastHitCollider != m_hoverCollider)
+        if (m_mouseIndicator.lastHitCollider != m_hoverCollider)
         {
             ChangeToState(SelectionStateEnum.empty);
             return;
         }
+
+        m_mouseIndicator.CoverLastHitCollider();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -204,23 +156,28 @@ public class GameManager : MonoBehaviour
 
     void EnterDrawCarry()
     {
-        m_mouseHighlightObject.gameObject.SetActive(true);
-        SetSelectorScale(m_hoverCollider.bounds.size);
+        m_mouseIndicator.SetSelectorScale(m_hoverCollider.bounds.size);
+
+        m_mouseIndicator.StartDrawLine();
     }
 
     void ExitDrawCarry()
     {
-        SetSelectorScaleToGridCellSize();
+        m_mouseIndicator.SetSelectorScaleToGridCellSize();
         m_hoverCollider = null;
         m_carryableObject = null;
+
+        m_mouseIndicator.FinishDrawLine();
     }
 
     void InvokeDrawCarry()
     {
-        if(Input.GetMouseButtonDown(0))
+        m_mouseIndicator.SetEndDrawLine();
+
+        if (Input.GetMouseButtonUp(0))
         {
             // Try to apply ant object placement.
-            AntManager.instance.SendGroupToCarryObject(m_carryableObject, m_mouseHighlightObject.position, m_mouseHighlightObject.rotation);
+            AntManager.instance.SendGroupToCarryObject(m_carryableObject, m_mouseIndicator.transform.position, m_mouseIndicator.transform.rotation);
 
             ChangeToState(SelectionStateEnum.empty);
         }
@@ -255,7 +212,7 @@ public class GameManager : MonoBehaviour
     {
         void IState<GameManager>.Enter(GameManager owner)
         {
-            owner.m_mouseHighlightObject.gameObject.SetActive(true);
+            
         }
 
         void IState<GameManager>.Exit(GameManager owner)
@@ -265,7 +222,7 @@ public class GameManager : MonoBehaviour
 
         void IState<GameManager>.Invoke(GameManager owner)
         {
-            if(Utility.ContainsLayer(owner.m_lastHitCollider.gameObject.layer, owner.m_carryObjectLayerMask))
+            if (owner.m_mouseIndicator.IsLastHitColliderCarriable())
             {
                 owner.ChangeToState(SelectionStateEnum.hoverCarryObject);
                 return;
