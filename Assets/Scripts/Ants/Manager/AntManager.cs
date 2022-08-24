@@ -7,11 +7,10 @@ public class AntManager : MonoBehaviour
     [SerializeField] AntSettings m_settings = null;
     public PlayerController m_player = null;
 
-    List<AntBoid> m_playerGroupedAnts = null;
-
-    List<AntBuildingGroup> m_buildGroups = null;
-
     List<AntBoid> m_allAnts = null;
+
+    List<AntBoid> m_playerGroupedAnts = null;
+    List<AntBuildingGroup> m_buildGroups = null;
 
     public AntSettings settings { get { return m_settings; } }
     public PlayerController player { get { return m_player; } }
@@ -83,26 +82,55 @@ public class AntManager : MonoBehaviour
         }
     }
 
-    public void InitiateLineBuild(Vector3 start, Vector3 end)
+    public bool InitiateLineBuild(Vector3 start, Vector3 end)
     {
-        int antCount = CalculateLineAntCount(start, end);
+        float lineLength = (end - start).magnitude;
+        int antCount = CalculateLineAntCount(lineLength);
+
+        if(CheckLineRay(start, end, lineLength))
+        {
+            return false;
+        }
+
         if (antCount <= AvailableAntCount())
         {
             AntBuildingGroup newGroup = new AntBuildingGroup(start, end, antCount);
             m_buildGroups.Add(newGroup);
-            for(int i = 0; i < antCount; i++)
+            for (int i = 0; i < antCount; i++)
             {
                 AntBoid antBoid = GetAvailableAnt();
                 antBoid.SetBuildGroup(newGroup);
             }
+
+            return true;
         }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool CheckLineRay(Vector3 start, Vector3 end, float lineLength)
+    {
+        return Physics.Raycast(start, (end - start), lineLength, settings.environmentObstuctionLayerMask, QueryTriggerInteraction.Ignore);
+    }
+
+    public bool CheckLineRay(Vector3 start, Vector3 end)
+    {
+        Vector3 toEnd = (end - start);
+        return Physics.Raycast(start, toEnd, toEnd.magnitude, settings.environmentObstuctionLayerMask, QueryTriggerInteraction.Ignore);
     }
 
     public int CalculateLineAntCount(Vector3 start, Vector3 end)
     {
         float lineLength = (end - start).magnitude;
-        lineLength /= settings.singleBuildHeight;
-        return (int)Mathf.Ceil(lineLength);
+        return CalculateLineAntCount(lineLength);
+    }
+
+    public int CalculateLineAntCount(float lineMagnitude)
+    {
+        lineMagnitude /= settings.singleBuildHeight;
+        return (int)Mathf.Ceil(lineMagnitude);
     }
 
     public void SendGroupToCarryObject(CarryableObject carryableObject, Vector3 targetCarryPosition, Quaternion targetCarryRotation)

@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour
     {
         InitialiseStateMachine();
         m_camLookTarget.SetMode(false);
+        m_camLookTarget.splitLerpAmount = m_regularCamLerp;
     }
 
     // Start is called before the first frame update
@@ -79,9 +80,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void InitiateAntBuild(Vector3 start, Vector3 end)
+    public bool InitiateAntBuild(Vector3 start, Vector3 end)
     {
-        AntManager.instance.InitiateLineBuild(start, end);
+        return AntManager.instance.InitiateLineBuild(start, end);
     }
 
     #region SelectionStates
@@ -109,7 +110,10 @@ public class GameManager : MonoBehaviour
         m_mouseIndicator.FinishDrawLine();
 
         // Send ants to build with this line
-        InitiateAntBuild(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
+        if (InitiateAntBuild(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd()))
+        {
+
+        }
 
         //m_camLookTarget.SetMode(true);
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
@@ -118,6 +122,7 @@ public class GameManager : MonoBehaviour
     void InvokeDrawLine()
     {
         m_mouseIndicator.SetEndDrawLine();
+        m_mouseIndicator.SetSelectionColour(!AntManager.instance.CheckLineRay(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd()));
 
         debugLineAntCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
     }
@@ -159,6 +164,7 @@ public class GameManager : MonoBehaviour
         m_mouseIndicator.SetSelectorScale(m_hoverCollider.bounds.size);
 
         m_mouseIndicator.StartDrawLine();
+        m_camLookTarget.splitLerpAmount = m_drawingCamLerp;
     }
 
     void ExitDrawCarry()
@@ -168,6 +174,7 @@ public class GameManager : MonoBehaviour
         m_carryableObject = null;
 
         m_mouseIndicator.FinishDrawLine();
+        m_camLookTarget.splitLerpAmount = m_regularCamLerp;
     }
 
     void InvokeDrawCarry()

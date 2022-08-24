@@ -10,6 +10,7 @@ public class AntAnimate : MonoBehaviour
     [SerializeField] Transform m_modelTransform = null;
 
     [SerializeField] float m_normalisedTransitionTime = 0.05f;
+    [SerializeField] float m_headingAllowance = 0.001f;
 
     void Start()
     {
@@ -31,7 +32,7 @@ public class AntAnimate : MonoBehaviour
     {
         Vector3 heading = m_ant.velocity;
         heading.y = 0;
-        if (heading.sqrMagnitude != 0)
+        if (heading.sqrMagnitude > m_headingAllowance)
         {
             m_modelTransform.forward = heading;
         }

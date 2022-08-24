@@ -1707,7 +1707,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 13ba95c2349f95948884109ae937f667, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2244,7 +2244,7 @@ MonoBehaviour:
   debugLineAntCount: 0
   m_camLookTarget: {fileID: 63665759}
   m_regularCamLerp: 0.1
-  m_drawingCamLerp: 0.5
+  m_drawingCamLerp: 0.4
   m_mouseIndicator: {fileID: 1632441295}
 --- !u!1 &1514224521
 GameObject:
@@ -2595,7 +2595,7 @@ MonoBehaviour:
   m_gridManager: {fileID: 629150597}
   m_raySelector: {fileID: 1351510358}
   m_lineTool: {fileID: 647297858}
-  m_selectorDistance: 5
+  m_selectorDistance: 25
   m_carryObjectLayerMask:
     serializedVersion: 2
     m_Bits: 512

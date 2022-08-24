@@ -17,6 +17,9 @@ MonoBehaviour:
   m_singleBuildHeight: 2
   m_buildArrivedistance: 1
   m_buildRotationSpeed: 5
+  m_environmentObstuctionLayerMask:
+    serializedVersion: 2
+    m_Bits: 262711
   m_climbSpeed: 3
   m_climbSnapDistance: 0.05
   m_ragdollRestTime: 2
