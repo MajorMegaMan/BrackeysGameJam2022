@@ -23,7 +23,6 @@ public class AntBoid : MonoBehaviour
     // Building
     AntBuildingGroup m_currentBuildGroup = null;
     Vector3 m_climbPosition = Vector3.zero;
-    [SerializeField] Collider m_frozenCollider = null;
 
     // Carrying
     CarryableObject m_currentCarryableObject = null;
@@ -48,8 +47,6 @@ public class AntBoid : MonoBehaviour
 
     private void Awake()
     {
-        m_frozenCollider.gameObject.SetActive(false);
-
         SetNavGettersToSelf();
     }
 
@@ -435,7 +432,6 @@ public class AntBoid : MonoBehaviour
         void IState<AntBoid>.Enter(AntBoid owner)
         {
             owner.StopNavigating();
-            owner.m_frozenCollider.gameObject.SetActive(true);
             if(owner.m_currentBuildGroup != null)
             {
                 owner.m_currentBuildGroup.FreezeAnt(owner);
@@ -444,7 +440,7 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
-            owner.m_frozenCollider.gameObject.SetActive(false);
+            
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)

@@ -12,6 +12,8 @@ public class AntManager : MonoBehaviour
     List<AntBoid> m_playerGroupedAnts = null;
     List<AntBuildingGroup> m_buildGroups = null;
 
+    [SerializeField] BridgeCollider m_bridgeColliderPrefab = null;
+
     public AntSettings settings { get { return m_settings; } }
     public PlayerController player { get { return m_player; } }
 
@@ -56,12 +58,17 @@ public class AntManager : MonoBehaviour
 
     public void ClearBuildGroups()
     {
-        for (int i = 0; i < m_buildGroups.Count; i++)
+        while (m_buildGroups.Count > 0)
         {
-            var group = m_buildGroups[i];
+            var group = m_buildGroups[0];
             group.Dissassemble();
         }
-        m_buildGroups.Clear();
+    }
+
+    // called during ant build group disassemble
+    public void RemoveBuildGroup(AntBuildingGroup buildGroup)
+    {
+        m_buildGroups.Remove(buildGroup);
     }
 
     public int AvailableAntCount()
@@ -94,7 +101,9 @@ public class AntManager : MonoBehaviour
 
         if (antCount <= AvailableAntCount())
         {
-            AntBuildingGroup newGroup = new AntBuildingGroup(start, end, antCount);
+            BridgeCollider newBridge = Instantiate(m_bridgeColliderPrefab, start, Quaternion.identity, transform);
+            newBridge.SetRotation(end - start);
+            AntBuildingGroup newGroup = new AntBuildingGroup(start, end, antCount, newBridge);
             m_buildGroups.Add(newGroup);
             for (int i = 0; i < antCount; i++)
             {

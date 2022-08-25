@@ -13,16 +13,21 @@ public class AntBuildingGroup
 
     int m_antLineCount = 0;
 
+    BridgeCollider m_bridgeCollider = null;
+
     public Vector3 start { get { return m_start; } }
     public Vector3 end { get { return m_end; } }
 
     bool m_startedClimbing = false;
 
-    public AntBuildingGroup(Vector3 start, Vector3 end, int antLinecount)
+    public AntBuildingGroup(Vector3 start, Vector3 end, int antLinecount, BridgeCollider bridgeCollider)
     {
         m_start = start;
         m_end = end;
         m_antLineCount = antLinecount;
+
+        m_bridgeCollider = bridgeCollider;
+        m_bridgeCollider.gameObject.SetActive(false);
     }
 
     public void AddAntToGroup(AntBoid antBoid)
@@ -42,9 +47,12 @@ public class AntBuildingGroup
     // Should use ants from the waiting queue. Otherwise unexpected behaviour might occur.
     public void FreezeAnt(AntBoid antBoid)
     {
+        m_bridgeCollider.gameObject.SetActive(true);
+
         m_frozenList.Add(antBoid);
         m_startedClimbing = false;
         SendNextAntToClimbPosition();
+        m_bridgeCollider.SetLength((CalculateClimbPosition() - start).magnitude);
     }
 
     public Vector3 GetLine()
@@ -76,5 +84,9 @@ public class AntBuildingGroup
 
         m_waitingToBuildQueue.Clear();
         m_frozenList.Clear();
+
+        m_bridgeCollider.Disassemble();
+
+        AntManager.instance.RemoveBuildGroup(this);
     }
 }
