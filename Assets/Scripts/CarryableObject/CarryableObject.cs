@@ -130,6 +130,12 @@ public class CarryableObject : MonoBehaviour
         m_targetRotation = rotation;
     }
 
+    public Vector3 GetTextPosition()
+    {
+        Bounds bounds = m_spaceCollider.bounds;
+        return bounds.center + Vector3.up * (bounds.extents.y + 1.0f);
+    }
+
     private void OnDrawGizmos()
     {
         if(m_spaceCollider != null)

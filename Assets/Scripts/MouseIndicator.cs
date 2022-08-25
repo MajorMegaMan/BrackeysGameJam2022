@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MouseIndicator : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class MouseIndicator : MonoBehaviour
     [SerializeField] Color m_validColour = Color.green;
     [SerializeField] Color m_invalidColour = Color.red;
     [SerializeField] float m_coverSkinWidth = 0.1f;
+
+    [Header("UI")]
+    [SerializeField] GameObject m_selectedAntCountCanvas = null;
+    [SerializeField] TMP_Text m_selectedAntCountText = null;
 
     Material m_selectorMaterial = null;
 
@@ -146,6 +151,11 @@ public class MouseIndicator : MonoBehaviour
         return m_lineTool.GetEnd();
     }
 
+    public Vector3 GetLineDir()
+    {
+        return m_lineTool.GetEnd() - m_lineTool.GetStart();
+    }
+
     Color CopyRGB(Color target, float a)
     {
         Color result = target;
@@ -170,6 +180,48 @@ public class MouseIndicator : MonoBehaviour
 
         m_selectorMaterial.SetColor("_Colour", baseColour);
         m_selectorMaterial.SetColor("_LineColour", lineColour);
+    }
+
+    public void EnableText(bool enabled)
+    {
+        m_selectedAntCountCanvas.SetActive(enabled);
+    }
+
+    public void SetTextPosition(Vector3 position)
+    {
+        m_selectedAntCountCanvas.transform.position = position;
+    }
+
+    public void TextLookAt(Transform target)
+    {
+        m_selectedAntCountCanvas.transform.LookAt(target);
+    }
+
+    public void SetAntCountText(int antCount)
+    {
+        m_selectedAntCountText.text = antCount.ToString();
+    }
+
+    public void UpdateTextForLine(Transform lookAt, int lineAntCount)
+    {
+        Vector3 lineDir = GetLineDir();
+        SetTextPosition(GetLineStart() + lineDir * 0.5f + Vector3.up * 1.0f);
+        SetAntCountText(lineAntCount);
+        TextLookAt(lookAt);
+    }
+
+    public void UpdateTextForLine(Transform lookAt)
+    {
+        Vector3 lineDir = GetLineDir();
+        float lineMagnitude = lineDir.magnitude;
+        UpdateTextForLine(lookAt, AntManager.instance.CalculateLineAntCount(lineMagnitude));
+    }
+
+    public void UpdateTextForCarryObject(Transform lookAt, CarryableObject carryableObject)
+    {
+        TextLookAt(lookAt);
+        SetAntCountText(carryableObject.antStrengthCount);
+        SetTextPosition(carryableObject.GetTextPosition());
     }
 
     private void OnValidate()
