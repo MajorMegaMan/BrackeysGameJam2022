@@ -102,7 +102,8 @@ public class AntManager : MonoBehaviour
         if (antCount <= AvailableAntCount())
         {
             BridgeCollider newBridge = Instantiate(m_bridgeColliderPrefab, start, Quaternion.identity, transform);
-            newBridge.SetRotation(end - start);
+            newBridge.SetBridgeLine(start, end);
+
             AntBuildingGroup newGroup = new AntBuildingGroup(start, end, antCount, newBridge);
             m_buildGroups.Add(newGroup);
             for (int i = 0; i < antCount; i++)

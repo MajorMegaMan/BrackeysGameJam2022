@@ -53,6 +53,11 @@ public class AntBuildingGroup
         m_startedClimbing = false;
         SendNextAntToClimbPosition();
         m_bridgeCollider.SetLength((CalculateClimbPosition() - start).magnitude);
+
+        if(m_frozenList.Count >= m_antLineCount)
+        {
+            m_bridgeCollider.EnableNavLink(true);
+        }
     }
 
     public Vector3 GetLine()
