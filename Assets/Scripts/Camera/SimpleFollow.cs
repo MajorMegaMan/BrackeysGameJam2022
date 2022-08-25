@@ -27,9 +27,9 @@ public class SimpleFollow : MonoBehaviour
 
             Vector3 targetPos = targetFollow.position - toTarget.normalized * distance;
 
-            Vector3 clampedPos = transform.position;
+            Vector3 clampedPos = targetPos;
             clampedPos.y = Mathf.Clamp(clampedPos.y, m_minHeight + targetFollow.position.y, m_maxHeight + targetFollow.position.y);
-            transform.position = Vector3.SmoothDamp(clampedPos, targetPos, ref m_smoothPosVelocity, m_smoothPosTime);
+            transform.position = Vector3.SmoothDamp(transform.position, clampedPos, ref m_smoothPosVelocity, m_smoothPosTime);
         }
 
         if(lookTarget != null)

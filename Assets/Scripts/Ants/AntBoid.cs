@@ -23,7 +23,6 @@ public class AntBoid : MonoBehaviour
     // Building
     AntBuildingGroup m_currentBuildGroup = null;
     Vector3 m_climbPosition = Vector3.zero;
-    [SerializeField] Collider m_frozenCollider = null;
 
     // Carrying
     CarryableObject m_currentCarryableObject = null;
@@ -38,13 +37,17 @@ public class AntBoid : MonoBehaviour
     PlayerController player { get { return AntManager.instance.player; } }
     AntSettings settings { get { return AntManager.instance.settings; } }
 
-    public float speed { get { return m_navAgent.speed; } }
-    public Vector3 velocity { get { return m_navAgent.velocity; } }
-    public float currentSpeed { get { return m_navAgent.velocity.magnitude; } }
+    delegate T NavGetter<T>();
+    NavGetter<float> m_speedGetter;
+    NavGetter<Vector3> m_velocityGetter;
+
+    public float speed { get { return m_speedGetter.Invoke(); } }
+    public Vector3 velocity { get { return m_velocityGetter.Invoke(); } }
+    public float currentSpeed { get { return GetCurrentSpeed(); } }
 
     private void Awake()
     {
-        m_frozenCollider.gameObject.SetActive(false);
+        SetNavGettersToSelf();
     }
 
     // Start is called before the first frame update
@@ -69,6 +72,46 @@ public class AntBoid : MonoBehaviour
     {
         m_actionStateMachine.Invoke();
     }
+
+    #region Getters
+    float GetNavSpeed()
+    {
+        return m_navAgent.speed;
+    }
+
+    Vector3 GetNavVelocity()
+    {
+        return m_navAgent.velocity;
+    }
+
+    float GetCurrentSpeed()
+    {
+        return m_velocityGetter.Invoke().magnitude;
+    }
+
+    float GetCarryNavSpeed()
+    {
+        return m_currentCarryableObject.speed;
+    }
+
+    Vector3 GetCarryNavVelocity()
+    {
+        return m_currentCarryableObject.velocity;
+    }
+
+    void SetNavGettersToSelf()
+    {
+        m_speedGetter = GetNavSpeed;
+        m_velocityGetter = GetNavVelocity;
+    }
+
+    void SetNavGettersToCarryObject()
+    {
+        m_speedGetter = GetCarryNavSpeed;
+        m_velocityGetter = GetCarryNavVelocity;
+    }
+
+    #endregion // !Getters
 
     // Should be called by the pick up Trigger event
     public void PlayerPickUpTriggerEvent()
@@ -373,7 +416,6 @@ public class AntBoid : MonoBehaviour
             if (remain < owner.settings.climbFinishDistance)
             {
                 // arrived
-                Debug.Log("Climbing Arrived");
                 owner.transform.position = owner.m_climbPosition;
                 owner.SetState(StateEnum.frozen);
             }
@@ -381,7 +423,6 @@ public class AntBoid : MonoBehaviour
             {
                 Vector3 lineDir = toClimbPos / remain;
                 owner.transform.position += lineDir * deltaMagnitude;
-                Debug.Log("Climbing");
             }
         }
     }
@@ -390,9 +431,7 @@ public class AntBoid : MonoBehaviour
     {
         void IState<AntBoid>.Enter(AntBoid owner)
         {
-            Debug.Log("Freeze");
             owner.StopNavigating();
-            owner.m_frozenCollider.gameObject.SetActive(true);
             if(owner.m_currentBuildGroup != null)
             {
                 owner.m_currentBuildGroup.FreezeAnt(owner);
@@ -401,7 +440,7 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
-            owner.m_frozenCollider.gameObject.SetActive(false);
+            
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -492,11 +531,13 @@ public class AntBoid : MonoBehaviour
         void IState<AntBoid>.Enter(AntBoid owner)
         {
             owner.EnterCarryHold();
+            owner.SetNavGettersToCarryObject();
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
             owner.SetCarriableObject(null, -1);
+            owner.SetNavGettersToSelf();
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)

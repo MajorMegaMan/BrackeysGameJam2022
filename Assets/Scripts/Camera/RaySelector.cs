@@ -17,10 +17,10 @@ public class RaySelector : MonoBehaviour
         
     }
 
-    public bool CamRayCast(out Ray camRay, out RaycastHit hitInfo)
+    public bool CamRayCast(out Ray camRay, out RaycastHit hitInfo, float distance = float.PositiveInfinity)
     {
         camRay = m_camera.ScreenPointToRay(Input.mousePosition);
-        return Physics.Raycast(camRay, out hitInfo, float.PositiveInfinity, m_camRayLayer, QueryTriggerInteraction.Ignore);
+        return Physics.Raycast(camRay, out hitInfo, distance, m_camRayLayer, QueryTriggerInteraction.Ignore);
     }
 
     public bool CamRayCast(out RaycastHit hitInfo)

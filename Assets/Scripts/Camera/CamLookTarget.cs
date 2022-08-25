@@ -6,12 +6,14 @@ public class CamLookTarget : MonoBehaviour
 {
     [SerializeField] Transform m_followTarget;
 
-    [SerializeField] Transform[] m_splitFollow;
+    [SerializeField] Transform m_splitFollow;
 
     delegate void FollowDelegate();
     FollowDelegate m_followDelegate;
 
     [SerializeField] bool m_modeIsSingle = true;
+
+    public float splitLerpAmount = 0.5f;
 
     private void Awake()
     {
@@ -37,15 +39,7 @@ public class CamLookTarget : MonoBehaviour
 
     void FollowSplit()
     {
-        Vector3 averagePos = m_followTarget.position;
-        for (int i = 0; i < m_splitFollow.Length; i++)
-        {
-            averagePos += m_splitFollow[i].position;
-        }
-
-        averagePos /= m_splitFollow.Length + 1;
-
-        transform.position = averagePos;
+        transform.position = Vector3.LerpUnclamped(m_followTarget.position, m_splitFollow.position, splitLerpAmount);
     }
 
     public void SetMode(bool isSingle)
