@@ -38,4 +38,14 @@ public class SimpleFollow : MonoBehaviour
             transform.LookAt(m_smoothLookPosition);
         }
     }
+
+    public void SetTargetFollow(Transform followTarget)
+    {
+        targetFollow = followTarget;
+    }
+
+    public void SetLookTarget(Transform lookTarget)
+    {
+        this.lookTarget = lookTarget;
+    }
 }

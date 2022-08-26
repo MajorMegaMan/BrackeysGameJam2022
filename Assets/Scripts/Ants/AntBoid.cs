@@ -396,7 +396,7 @@ public class AntBoid : MonoBehaviour
             owner.StopNavigating();
 
             Vector3 lineDir = owner.m_currentBuildGroup.GetLine().normalized;
-            owner.transform.up = lineDir;
+            owner.transform.forward = lineDir;
 
             owner.m_antAnimator.Climb();
         }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] PlayerController m_player = null;
     [SerializeField] GridManager m_gridManager = null;
 
     [SerializeField] int debugLineAntCount = 0;
@@ -11,6 +12,8 @@ public class GameManager : MonoBehaviour
     PackagedStateMachine<GameManager> m_selectionStateMachine;
 
     // CameraRelated
+    [Header("Camera Var")]
+    [SerializeField] SimpleFollow m_cameraFollow = null;
     [SerializeField] CamLookTarget m_camLookTarget = null;
     [SerializeField] float m_regularCamLerp = 0.1f;
     [SerializeField] float m_drawingCamLerp = 0.5f;
@@ -28,6 +31,7 @@ public class GameManager : MonoBehaviour
 
     // Getters
     public GridManager gridManager { get { return m_gridManager; } }
+    public PlayerController player { get { return m_player; } }
 
     private void Awake()
     {
@@ -51,6 +55,11 @@ public class GameManager : MonoBehaviour
     void Initialise()
     {
         InitialiseStateMachine();
+
+        m_cameraFollow.SetLookTarget(m_camLookTarget.transform);
+        m_cameraFollow.SetTargetFollow(player.transform);
+
+        m_camLookTarget.SetFollowTarget(player.transform);
         m_camLookTarget.SetMode(false);
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
 
