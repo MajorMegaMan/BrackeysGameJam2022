@@ -6,7 +6,6 @@ using TMPro;
 public class AntManager : MonoBehaviour
 {
     [SerializeField] AntSettings m_settings = null;
-    public PlayerController m_player = null;
 
     List<AntBoid> m_allAnts = null;
 
@@ -19,7 +18,7 @@ public class AntManager : MonoBehaviour
     [SerializeField] TMP_Text m_UIantCountText;
 
     public AntSettings settings { get { return m_settings; } }
-    public PlayerController player { get { return m_player; } }
+    public PlayerController player { get { return GameManager.instance.player; } }
 
     // Singletons baby.
     static AntManager _instance = null;

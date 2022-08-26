@@ -54,6 +54,11 @@ public class CamLookTarget : MonoBehaviour
         }
     }
 
+    public void SetFollowTarget(Transform followTarget)
+    {
+        m_followTarget = followTarget;
+    }
+
     private void OnValidate()
     {
         if(Application.isPlaying)

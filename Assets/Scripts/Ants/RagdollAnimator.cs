@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class RagdollAnimator : MonoBehaviour
 {
@@ -8,6 +9,11 @@ public class RagdollAnimator : MonoBehaviour
     [SerializeField] Rigidbody[] m_rigidBodies;
 
     [SerializeField] bool m_isActive = false;
+
+    [SerializeField] UnityEvent<bool> m_onRagdollChange = null;
+
+    public Rigidbody[] rigidBodies { get { return m_rigidBodies; } }
+    public UnityEvent<bool> onRagdollChange { get { return m_onRagdollChange; } }
 
     private void Awake()
     {
@@ -34,6 +40,8 @@ public class RagdollAnimator : MonoBehaviour
         {
             m_rigidBodies[i].gameObject.SetActive(isActive);
         }
+
+        m_onRagdollChange.Invoke(isActive);
     }
 
     public Rigidbody GetRigidbody(int index)

@@ -22,18 +22,23 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: D_Ant_Material
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _SPECULAR_SETUP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap:
     RenderType: Opaque
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_4450AB74:
+        m_Texture: {fileID: 2800000, guid: f4116160a9201164599cc082ec9f6219, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -92,6 +97,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - Boolean_193028D2: 1
+    - Boolean_3F1A8DAB: 1
+    - Boolean_43476D73: 0
+    - Boolean_7165A49C: 1
+    - Boolean_85059BBE: 0
+    - Boolean_8BBF99CD: 1
+    - Boolean_D258FF8E: 0
+    - Vector1_21C41D02: 256
+    - Vector1_6F288C5B: 0.5
+    - Vector1_B2CC132F: 899.9
+    - Vector1_B9994903: 299.5
+    - Vector1_E8746023: 1525.46
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -106,21 +123,24 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Metallic: 0
+    - _Metallic: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.5
+    - _Smoothness: 0.367
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _WorkflowMode: 1
+    - _WorkflowMode: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.5, g: 0.11084905, b: 0.11084905, a: 1}
-    - _Color: {r: 0.5, g: 0.11084903, b: 0.11084903, a: 1}
+    - Color_2E5415DE: {r: 1, g: 1, b: 1, a: 0}
+    - Vector2_8044833E: {r: 1, g: 1, b: 0, a: 0}
+    - _BaseColor: {r: 0.005206477, g: 0.005206477, b: 0.122641504, a: 1}
+    - _Color: {r: 0.005206477, g: 0.005206477, b: 0.12264148, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecColor: {r: 0.2798149, g: 0.3055334, b: 0.4528302, a: 1}
   m_BuildTextureStacks: []
