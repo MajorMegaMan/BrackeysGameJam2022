@@ -114,9 +114,9 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColourMask: {r: 0.8396226, g: 0.3128782, b: 0.3128782, a: 1}
+    - _ColourMask: {r: 0.7830189, g: 0.5207114, b: 0.18836774, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _OutLineColour: {r: 0.19811317, g: 0.0252314, b: 0.0252314, a: 1}
+    - _OutLineColour: {r: 0.2, g: 0.11636968, b: 0.02352941, a: 1}
     - _OutlineColour: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
