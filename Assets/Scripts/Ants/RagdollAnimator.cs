@@ -35,6 +35,7 @@ public class RagdollAnimator : MonoBehaviour
     public void Activate(bool isActive)
     {
         m_isActive = isActive;
+
         m_anim.enabled = !isActive;
         for(int i = 0; i < m_rigidBodies.Length; i++)
         {

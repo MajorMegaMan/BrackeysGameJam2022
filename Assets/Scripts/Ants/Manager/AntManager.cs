@@ -146,7 +146,7 @@ public class AntManager : MonoBehaviour
         return (int)Mathf.Ceil(lineMagnitude);
     }
 
-    public void SendGroupToCarryObject(CarryableObject carryableObject, Vector3 targetCarryPosition, Quaternion targetCarryRotation)
+    public bool SendGroupToCarryObject(CarryableObject carryableObject, Vector3 targetCarryPosition, Quaternion targetCarryRotation)
     {
         int antCount = carryableObject.antStrengthCount;
         if (AvailableAntCount() >= antCount)
@@ -158,7 +158,9 @@ public class AntManager : MonoBehaviour
                 var ant = GetAvailableAnt();
                 ant.CarryObject(carryableObject, i);
             }
+            return true;
         }
+        return false;
     }
 
     #region AntListManagement

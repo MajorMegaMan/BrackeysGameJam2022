@@ -34,6 +34,22 @@ public class AntSettings : ScriptableObject
     [Header("Carry Variables")]
     [SerializeField] float m_carrySnapDistance = 0.1f;
 
+    [Header("Audio")]
+    [SerializeField] AudioClip[] m_positiveAntSounds = null;
+    [SerializeField] AudioClip[] m_negativeAntSounds = null;
+    [SerializeField] AudioClip[] m_footSounds = null;
+
+    [SerializeField] float m_antSoundVolume = 1.0f;
+
+    [SerializeField] float m_footPlayFrequency = 0.8f;
+    [SerializeField] float m_footStepRandomTimeStep = 0.1f;
+    [SerializeField, Range(0.0f, 1.0f)] float m_footVolume = 0.3f;
+
+    [SerializeField] float m_audioPollutionCount = 2.0f;
+    [SerializeField] float m_audioPollutionExponent = 2.0f;
+
+    [SerializeField] float m_halfPitchRange = 0.2f;
+
     public float pickUpRadius { get { return m_pickUpRadius; } }
     public float followDistance { get { return m_followDistance; } }
 
@@ -49,4 +65,17 @@ public class AntSettings : ScriptableObject
     public float ragdollMinSpeedThreshold { get { return m_ragdollMinSpeedThreshold; } }
 
     public float carrySnapDistance { get { return m_carrySnapDistance; } }
+
+    #region Audio
+    public AudioClip[] positiveAntSounds { get { return m_positiveAntSounds; } }
+    public AudioClip[] negativeAntSounds { get { return m_negativeAntSounds; } }
+    public AudioClip[] footSounds { get { return m_footSounds; } }
+    public float antSoundVolume { get { return m_antSoundVolume; } }
+    public float footPlayFrequency { get { return m_footPlayFrequency; } }
+    public float footStepRandomTimeStep { get { return m_footStepRandomTimeStep; } }
+    public float footVolume { get { return m_footVolume; } }
+    public float audioPollutionCount { get { return m_audioPollutionCount; } }
+    public float audioPollutionExponent { get { return m_audioPollutionExponent; } }
+    public float halfPitchRange { get { return m_halfPitchRange; } }
+    #endregion // !Audio
 }
