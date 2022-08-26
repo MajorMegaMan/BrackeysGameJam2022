@@ -12,6 +12,8 @@ public class InputReceiver : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.z = Input.GetAxisRaw("Vertical");
 
+        movement = Vector3.ClampMagnitude(movement, 1.0f);
+
         return ConvertInput(movement);
     }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] PlayerController m_player = null;
+    [SerializeField] PlayerAudio m_playerAudio = null;
     [SerializeField] GridManager m_gridManager = null;
 
     [SerializeField] int debugLineAntCount = 0;
@@ -32,6 +33,7 @@ public class GameManager : MonoBehaviour
     // Getters
     public GridManager gridManager { get { return m_gridManager; } }
     public PlayerController player { get { return m_player; } }
+    public PlayerAudio playerAudio { get { return m_playerAudio; } }
 
     private void Awake()
     {
@@ -145,7 +147,11 @@ public class GameManager : MonoBehaviour
         // Send ants to build with this line
         if (InitiateAntBuild(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd()))
         {
-
+            playerAudio.PlayPositiveAntSound();
+        }
+        else
+        {
+            playerAudio.PlayNegativeAntSound();
         }
 
         //m_camLookTarget.SetMode(true);
@@ -243,7 +249,14 @@ public class GameManager : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             // Try to apply ant object placement.
-            AntManager.instance.SendGroupToCarryObject(m_carryableObject, m_mouseIndicator.transform.position, m_mouseIndicator.transform.rotation);
+            if(AntManager.instance.SendGroupToCarryObject(m_carryableObject, m_mouseIndicator.transform.position, m_mouseIndicator.transform.rotation))
+            {
+                playerAudio.PlayPositiveAntSound();
+            }
+            else
+            {
+                playerAudio.PlayNegativeAntSound();
+            }
 
             ChangeToState(SelectionStateEnum.empty);
         }
