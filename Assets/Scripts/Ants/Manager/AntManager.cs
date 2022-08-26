@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class AntManager : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class AntManager : MonoBehaviour
     List<AntBuildingGroup> m_buildGroups = null;
 
     [SerializeField] BridgeCollider m_bridgeColliderPrefab = null;
+
+    // UI
+    [SerializeField] TMP_Text m_UIantCountText;
 
     public AntSettings settings { get { return m_settings; } }
     public PlayerController player { get { return m_player; } }
@@ -45,7 +49,7 @@ public class AntManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        m_UIantCountText.text = m_playerGroupedAnts.Count.ToString();
     }
 
     public void ReleaseAllAnts()
@@ -162,11 +166,13 @@ public class AntManager : MonoBehaviour
     public void AddToPlayerGroup(AntBoid antBoid)
     {
         m_playerGroupedAnts.Add(antBoid);
+        m_UIantCountText.text = m_playerGroupedAnts.Count.ToString();
     }
 
     public void RemoveFromPlayerGroup(AntBoid antBoid)
     {
         m_playerGroupedAnts.Remove(antBoid);
+        m_UIantCountText.text = m_playerGroupedAnts.Count.ToString();
     }
 
     public void AddToAllAnts(AntBoid antBoid)

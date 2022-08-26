@@ -53,6 +53,8 @@ public class GameManager : MonoBehaviour
         InitialiseStateMachine();
         m_camLookTarget.SetMode(false);
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
+
+        m_mouseIndicator.EnableText(false);
     }
 
     // Start is called before the first frame update
@@ -74,15 +76,18 @@ public class GameManager : MonoBehaviour
             AntManager.instance.ReleaseAllAnts();
         }
 
-        if (m_mouseIndicator.CamRayCast())
-        {
-            m_selectionStateMachine.Invoke();
-        }
+        m_mouseIndicator.CamRayCast();
+        m_selectionStateMachine.Invoke();
     }
 
     public bool InitiateAntBuild(Vector3 start, Vector3 end)
     {
         return AntManager.instance.InitiateLineBuild(start, end);
+    }
+
+    public void UpdateSelectorColour(int antCount, bool valid = true)
+    {
+        m_mouseIndicator.SetSelectionColour(valid && antCount <= AntManager.instance.AvailableAntCount());
     }
 
     #region SelectionStates
@@ -98,11 +103,30 @@ public class GameManager : MonoBehaviour
         ChangeToState(SelectionStateEnum.drawing);
     }
 
+    void InvokeEmpty()
+    {
+        if (m_mouseIndicator.IsLastHitColliderCarriable())
+        {
+            ChangeToState(SelectionStateEnum.hoverCarryObject);
+            return;
+        }
+
+        // Find selection colour. for now just set to valid
+        m_mouseIndicator.SetSelectionColour(true);
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            EmptyStateClick();
+        }
+    }
+
     void EnterDrawing()
     {
         m_mouseIndicator.StartDrawLine();
 
         m_camLookTarget.splitLerpAmount = m_drawingCamLerp;
+
+        m_mouseIndicator.EnableText(true);
     }
 
     void ExitDrawing()
@@ -117,12 +141,26 @@ public class GameManager : MonoBehaviour
 
         //m_camLookTarget.SetMode(true);
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
+
+        m_mouseIndicator.EnableText(false);
     }
 
     void InvokeDrawLine()
     {
         m_mouseIndicator.SetEndDrawLine();
-        m_mouseIndicator.SetSelectionColour(!AntManager.instance.CheckLineRay(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd()));
+        bool validLineRay = !AntManager.instance.CheckLineRay(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            ChangeToState(SelectionStateEnum.empty);
+            return;
+        }
+
+
+        int antCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
+        UpdateSelectorColour(antCount, validLineRay);
+
+        m_mouseIndicator.UpdateTextForLine(Camera.main.transform, antCount);
 
         debugLineAntCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
     }
@@ -131,6 +169,8 @@ public class GameManager : MonoBehaviour
     {
         m_hoverCollider = m_mouseIndicator.lastHitCollider;
         m_carryableObject = m_hoverCollider.GetComponent<CarryableObject>();
+
+        m_mouseIndicator.EnableText(true);
     }
 
     void ExitHover()
@@ -140,6 +180,8 @@ public class GameManager : MonoBehaviour
             m_mouseIndicator.SetSelectorScaleToGridCellSize();
             m_hoverCollider = null;
             m_carryableObject = null;
+
+            m_mouseIndicator.EnableText(false);
         }
     }
 
@@ -152,6 +194,10 @@ public class GameManager : MonoBehaviour
         }
 
         m_mouseIndicator.CoverLastHitCollider();
+
+        UpdateSelectorColour(m_carryableObject.antStrengthCount);
+
+        m_mouseIndicator.UpdateTextForCarryObject(Camera.main.transform, m_carryableObject);
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -173,6 +219,8 @@ public class GameManager : MonoBehaviour
         m_hoverCollider = null;
         m_carryableObject = null;
 
+        m_mouseIndicator.EnableText(false);
+
         m_mouseIndicator.FinishDrawLine();
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
     }
@@ -180,6 +228,8 @@ public class GameManager : MonoBehaviour
     void InvokeDrawCarry()
     {
         m_mouseIndicator.SetEndDrawLine();
+
+        m_mouseIndicator.UpdateTextForCarryObject(Camera.main.transform, m_carryableObject);
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -229,16 +279,7 @@ public class GameManager : MonoBehaviour
 
         void IState<GameManager>.Invoke(GameManager owner)
         {
-            if (owner.m_mouseIndicator.IsLastHitColliderCarriable())
-            {
-                owner.ChangeToState(SelectionStateEnum.hoverCarryObject);
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                owner.EmptyStateClick();
-            }
+            owner.InvokeEmpty();
         }
     }
 
@@ -256,12 +297,6 @@ public class GameManager : MonoBehaviour
 
         void IState<GameManager>.Invoke(GameManager owner)
         {
-            if (Input.GetMouseButtonUp(0))
-            {
-                owner.ChangeToState(SelectionStateEnum.empty);
-                return;
-            }
-
             owner.InvokeDrawLine();
         }
     }

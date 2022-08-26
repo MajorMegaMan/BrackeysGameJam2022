@@ -57,4 +57,9 @@ public class BuildLineTool : MonoBehaviour
     {
         m_lineRenderer.gameObject.SetActive(false);
     }
+
+    public void SetColourGradient(Gradient colourGradient)
+    {
+        m_lineRenderer.colorGradient = colourGradient;
+    }
 }
