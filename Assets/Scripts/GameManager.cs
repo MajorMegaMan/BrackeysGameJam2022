@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,7 +9,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] PlayerAudio m_playerAudio = null;
     [SerializeField] GridManager m_gridManager = null;
 
-    [SerializeField] int debugLineAntCount = 0;
+    [SerializeField] AudioClip m_defaultMusicClip = null;
+    [SerializeField] float m_defaultMusicVolume = 0.15f;
+    [SerializeField] AudioMixerGroup m_defaultMusicMixer = null;
+
+    [SerializeField] MenuAnimationGroup m_pauseMenu = null;
+    [SerializeField] MenuAnimationGroup m_settingsPanel = null;
+    bool m_gamePaused = false;
 
     PackagedStateMachine<GameManager> m_selectionStateMachine;
 
@@ -34,6 +41,11 @@ public class GameManager : MonoBehaviour
     public GridManager gridManager { get { return m_gridManager; } }
     public PlayerController player { get { return m_player; } }
     public PlayerAudio playerAudio { get { return m_playerAudio; } }
+    public AudioClip defaultMusicClip { get { return m_defaultMusicClip; } }
+    public float defaultMusicVolume { get { return m_defaultMusicVolume; } }
+    public AudioMixerGroup defaultMusicMixer { get { return m_defaultMusicMixer; } }
+
+    public bool gamePaused { get { return m_gamePaused; } }
 
     private void Awake()
     {
@@ -87,8 +99,26 @@ public class GameManager : MonoBehaviour
             AntManager.instance.ReleaseAllAnts();
         }
 
-        m_mouseIndicator.CamRayCast();
-        m_selectionStateMachine.Invoke();
+        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        {
+            if(m_gamePaused)
+            {
+                m_pauseMenu.BeginExit();
+                m_settingsPanel.BeginExit();
+                m_gamePaused = false;
+            }
+            else
+            {
+                m_pauseMenu.BeginEnter();
+                m_gamePaused = true;
+            }
+        }
+
+        if(!gamePaused)
+        {
+            m_mouseIndicator.CamRayCast();
+            m_selectionStateMachine.Invoke();
+        }
     }
 
     public bool InitiateAntBuild(Vector3 start, Vector3 end)
@@ -176,8 +206,6 @@ public class GameManager : MonoBehaviour
         UpdateSelectorColour(antCount, validLineRay);
 
         m_mouseIndicator.UpdateTextForLine(Camera.main.transform, antCount);
-
-        debugLineAntCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
     }
 
     void EnterHover()

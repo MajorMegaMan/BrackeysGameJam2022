@@ -18,6 +18,9 @@ public class SimpleFollow : MonoBehaviour
     [SerializeField] float m_maxHeight = 3.0f;
     [SerializeField] float m_minHeight = 2.0f;
 
+    public float smoothPosTime { get { return m_smoothPosTime; } set { m_smoothPosTime = value; } }
+    public float smoothLookTime { get { return m_smoothLookTime; } set { m_smoothLookTime = value; } }
+
     // Update is called once per frame
     void Update()
     {

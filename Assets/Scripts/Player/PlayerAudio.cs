@@ -8,6 +8,10 @@ public class PlayerAudio : MonoBehaviour
 
     [SerializeField] AudioSource m_audioSource = null;
 
+    [Header("Player Sound Overrides")]
+    [SerializeField] float m_antSoundMultiplier = 1.0f;
+    [SerializeField] float m_footSoundMultiplier = 1.0f;
+
     float m_footTimer = 0.0f;
 
     float m_basePitch;
@@ -40,17 +44,17 @@ public class PlayerAudio : MonoBehaviour
 
     public void PlayFootSound()
     {
-        PlayRandomAudio(settings.footSounds, settings.footVolume);
+        PlayRandomAudio(settings.footSounds, settings.footVolume * m_footSoundMultiplier);
     }
 
     public void PlayPositiveAntSound()
     {
-        PlayRandomAudio(settings.positiveAntSounds, settings.antSoundVolume);
+        PlayRandomAudio(settings.positiveAntSounds, settings.antSoundVolume * m_antSoundMultiplier);
     }
 
     public void PlayNegativeAntSound()
     {
-        PlayRandomAudio(settings.negativeAntSounds, settings.antSoundVolume);
+        PlayRandomAudio(settings.negativeAntSounds, settings.antSoundVolume * m_antSoundMultiplier);
     }
 
     void PlayRandomAudio(AudioClip[] clipArray, float volume)
