@@ -10,6 +10,8 @@ public class MenuAnimationGroup : MonoBehaviour
     [SerializeField] bool m_isActive = true;
     [SerializeField] bool m_autoBegin = false;
 
+    public bool isActive { get { return m_isActive; } }
+
     private void Awake()
     {
         if(m_atStart)

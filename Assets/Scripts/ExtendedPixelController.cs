@@ -6,6 +6,7 @@ using PSX;
 public class ExtendedPixelController : PixelationController
 {
     [SerializeField] Camera m_camera;
+    [SerializeField] float m_targetWidth = 1920;
     [SerializeField] float m_pixelRatio = 2.0f;
 
     int lastWidth;
@@ -15,8 +16,7 @@ public class ExtendedPixelController : PixelationController
         set 
         { 
             m_pixelRatio = value;
-            widthPixelation = lastWidth / m_pixelRatio;
-            heightPixelation = lastHeight / m_pixelRatio;
+            UpdateSizeVar();
         }
     }
 
@@ -31,9 +31,15 @@ public class ExtendedPixelController : PixelationController
     {
         if(UpdateLastCamSize())
         {
-            widthPixelation = lastWidth / m_pixelRatio;
-            heightPixelation = lastHeight / m_pixelRatio;
+            UpdateSizeVar();
         }
+    }
+
+    void UpdateSizeVar()
+    {
+        float widthResolutionScale = m_targetWidth / lastWidth;
+        widthPixelation = (lastWidth / m_pixelRatio) * widthResolutionScale;
+        heightPixelation = (lastHeight / m_pixelRatio) * widthResolutionScale;
     }
 
     public bool UpdateLastCamSize()
@@ -56,8 +62,7 @@ public class ExtendedPixelController : PixelationController
         {
             UpdateLastCamSize();
 
-            widthPixelation = lastWidth / m_pixelRatio;
-            heightPixelation = lastHeight / m_pixelRatio;
+            UpdateSizeVar();
         }
     }
 }

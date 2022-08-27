@@ -5,8 +5,12 @@ using UnityEngine;
 
 public abstract class LazyMonoSingletonBase<T> : MonoBehaviour where T : LazyMonoSingletonBase<T>
 {
-    private static readonly Lazy<T> _lazyInstance = new Lazy<T>(CreateSingleton);
-    public static T instance { get { return _lazyInstance.Value; } }
+    static T _instance = null;
+    public static T instance { get { return _instanceGetter.Invoke(); } }
+
+
+    delegate T InstanceGetter();
+    static InstanceGetter _instanceGetter = CreateSingleton;
 
     private static T CreateSingleton()
     {
@@ -23,10 +27,25 @@ public abstract class LazyMonoSingletonBase<T> : MonoBehaviour where T : LazyMon
         {
             ownerObject = new GameObject($"{typeof(T).Name} (singleton)");
             instance = ownerObject.AddComponent<T>();
+            instance.OnCreateInstance();
         }
 
         DontDestroyOnLoad(ownerObject);
+
+        _instance = instance;
+        _instanceGetter = ReturnSingleton;
+
         return instance;
+    }
+
+    private static T ReturnSingleton()
+    {
+        return _instance;
+    }
+
+    protected virtual void OnCreateInstance()
+    {
+
     }
 }
 

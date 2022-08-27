@@ -16,4 +16,9 @@ public class LevelLoader : MonoBehaviour
         SceneManager.LoadScene(sceneBuildIndex);
         BackgroundMusic.instance.EnableAudioListener(true);
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

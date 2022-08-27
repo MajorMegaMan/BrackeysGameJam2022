@@ -36,4 +36,16 @@ public class BackgroundMusic : LazyMonoSingletonBase<BackgroundMusic>
     {
         m_selfListener.enabled = enabled;
     }
+
+    protected override void OnCreateInstance()
+    {
+        if(GameManager.instance != null)
+        {
+            m_audioSource.clip = GameManager.instance.defaultMusicClip;
+            m_audioSource.volume = GameManager.instance.defaultMusicVolume;
+            m_audioSource.outputAudioMixerGroup = GameManager.instance.defaultMusicMixer;
+        }
+        m_audioSource.Play();
+        m_audioSource.loop = true;
+    }
 }

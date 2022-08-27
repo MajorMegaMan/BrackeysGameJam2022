@@ -8,10 +8,6 @@ public class MenuAnimationManager : MonoBehaviour
     [SerializeField] MenuAnimationGroup m_settingsPanel = null;
     [SerializeField] MenuAnimationGroup m_creditsPanel = null;
 
-    [SerializeField] ExtendedPixelController m_pixelController = null;
-    [SerializeField] float m_fadeInTime = 1.0f;
-    [SerializeField] float m_beginPixelRatio = 200.0f;
-
     [Header("Camera")]
     [SerializeField] SimpleFollow m_cameraFollow = null;
     [SerializeField] Transform m_camSpinner = null;
@@ -24,55 +20,28 @@ public class MenuAnimationManager : MonoBehaviour
     [SerializeField] float m_creditsMoveTime = 1.0f;
     [SerializeField] float m_creditsLookTime = 1.0f;
 
-    delegate void UpdateDelegate();
-    UpdateDelegate m_updateDelegate;
-
-    float m_updateTimer = 0.0f;
-
-    float m_targetPixelRatio;
-
     private void Awake()
     {
-        m_updateDelegate = UpdateFade;
+        
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        m_targetPixelRatio = m_pixelController.pixelRatio;
-        m_pixelController.pixelRatio = m_beginPixelRatio;
-        m_pixelController.UpdateLastCamSize();
-
         SetCameraSpinning();
     }
 
     // Update is called once per frame
     void Update()
     {
-        m_updateDelegate.Invoke();
+        
     }
 
-    void UpdateFade()
+    public void HideAll()
     {
-        m_updateTimer += Time.deltaTime;
-        if(m_updateTimer > m_fadeInTime)
-        {
-            m_updateTimer -= m_fadeInTime;
-            m_updateDelegate = Empty;
-
-            m_pixelController.pixelRatio = Mathf.Lerp(m_beginPixelRatio, m_targetPixelRatio, 1.0f);
-
-            m_mainMenu.BeginEnter();
-        }
-        else
-        {
-            m_pixelController.pixelRatio = Mathf.Lerp(m_beginPixelRatio, m_targetPixelRatio, m_updateTimer / m_fadeInTime);
-        }
-    }
-
-    void Empty()
-    {
-
+        m_mainMenu.BeginExit();
+        m_settingsPanel.BeginExit();
+        m_creditsPanel.BeginExit();
     }
 
     public void ShowMain()
@@ -86,6 +55,7 @@ public class MenuAnimationManager : MonoBehaviour
     {
         m_mainMenu.BeginExit();
         m_settingsPanel.BeginEnter();
+        m_creditsPanel.BeginExit();
     }
 
     public void ShowCredits()
