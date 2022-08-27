@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UI Ant Head Material
+  m_Name: Title Ant Material 1
   m_Shader: {fileID: -6465566751694194690, guid: b248e73deb1448645bb8a46c98ee97f4,
     type: 3}
   m_ValidKeywords: []
@@ -115,9 +115,9 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColourMask: {r: 0.25689018, g: 0.18823525, b: 0.78431374, a: 1}
+    - _ColourMask: {r: 0.6792453, g: 0.397866, b: 0.041651852, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _OutLineColour: {r: 0.02352941, g: 0.02740517, b: 0.19999993, a: 1}
+    - _OutLineColour: {r: 0.2, g: 0.11636968, b: 0.02352941, a: 1}
     - _OutlineColour: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Vector2: {r: 0, g: 0, b: 0, a: 0}

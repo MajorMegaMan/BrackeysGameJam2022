@@ -11,20 +11,34 @@ public class ExtendedPixelController : PixelationController
     int lastWidth;
     int lastHeight;
 
+    public float pixelRatio { get { return m_pixelRatio; } 
+        set 
+        { 
+            m_pixelRatio = value;
+            widthPixelation = lastWidth / m_pixelRatio;
+            heightPixelation = lastHeight / m_pixelRatio;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        UpdateLastCamSize(m_camera);
+        UpdateLastCamSize();
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        if(UpdateLastCamSize(m_camera))
+        if(UpdateLastCamSize())
         {
             widthPixelation = lastWidth / m_pixelRatio;
             heightPixelation = lastHeight / m_pixelRatio;
         }
+    }
+
+    public bool UpdateLastCamSize()
+    {
+        return UpdateLastCamSize(m_camera);
     }
 
     bool UpdateLastCamSize(Camera cam)
@@ -40,7 +54,7 @@ public class ExtendedPixelController : PixelationController
     {
         if (m_camera != null)
         {
-            UpdateLastCamSize(m_camera);
+            UpdateLastCamSize();
 
             widthPixelation = lastWidth / m_pixelRatio;
             heightPixelation = lastHeight / m_pixelRatio;
