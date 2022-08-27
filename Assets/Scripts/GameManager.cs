@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioMixerGroup m_defaultMusicMixer = null;
 
     [SerializeField] MenuAnimationGroup m_pauseMenu = null;
+    [SerializeField] MenuAnimationGroup m_settingsPanel = null;
     bool m_gamePaused = false;
 
     PackagedStateMachine<GameManager> m_selectionStateMachine;
@@ -103,6 +104,7 @@ public class GameManager : MonoBehaviour
             if(m_gamePaused)
             {
                 m_pauseMenu.BeginExit();
+                m_settingsPanel.BeginExit();
                 m_gamePaused = false;
             }
             else
