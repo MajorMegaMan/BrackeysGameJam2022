@@ -183,7 +183,7 @@ AudioSource:
   m_GameObject: {fileID: 9031318542222034788}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: c189f493fdee8284ba231357c6ee7898,
+  OutputAudioMixerGroup: {fileID: 2829560327180945781, guid: c189f493fdee8284ba231357c6ee7898,
     type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
@@ -285,27 +285,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_player: {fileID: 3557425001358406506}
   m_audioSource: {fileID: 7485211046716514968}
-  m_positiveAntSounds:
-  - {fileID: 8300000, guid: ba6850483f3de4e45bba74a8ac1b3347, type: 3}
-  - {fileID: 8300000, guid: ddad137d7e6c0b84e9394abe11e989b8, type: 3}
-  - {fileID: 8300000, guid: e4ab2a1170a42c441bc770e61f688fa3, type: 3}
-  - {fileID: 8300000, guid: d95e0f3a8128605468db922cd5dc7cc8, type: 3}
-  - {fileID: 8300000, guid: c322303597205fa448efe70cdcc5b759, type: 3}
-  - {fileID: 8300000, guid: d19bdd47b0dcacb4a9f4260408d3802f, type: 3}
-  - {fileID: 8300000, guid: 2ca58b103159def4ea3e538f9694ab0a, type: 3}
-  - {fileID: 8300000, guid: 4e3e76fcf4c0da34184b958f824cfa48, type: 3}
-  - {fileID: 8300000, guid: ecd872f1ad4bd0a47a1733dfc99f25d6, type: 3}
-  m_negativeAntSounds:
-  - {fileID: 8300000, guid: e79eb56f7b900a34584e7577bdfa4799, type: 3}
-  - {fileID: 8300000, guid: c27a89f8fe78518498117d28c84945d1, type: 3}
-  - {fileID: 8300000, guid: c84252b1175b8b14497cca72dacf74de, type: 3}
-  m_footSounds:
-  - {fileID: 8300000, guid: 86605731c94861f4b8bdc0c3fb142e1d, type: 3}
-  - {fileID: 8300000, guid: 517508f2edb339d4882fb819bd9bdf4d, type: 3}
-  m_antSoundVolume: 1
-  m_footPlayFrequency: 0.8
-  m_footVolume: 0.3
-  m_halfPitchRange: 0.2
 --- !u!1001 &248598264388006810
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
         Vector3 moveDir = m_moveInput;
         if (isGrounded)
         {
-            moveDir = Vector3.ProjectOnPlane(moveDir, m_groundNormal);
+            //moveDir = Vector3.ProjectOnPlane(moveDir, m_groundNormal);
         }
 
         m_velocity = moveDir * m_speed;

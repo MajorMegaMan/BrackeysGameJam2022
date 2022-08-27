@@ -1060,6 +1060,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7728635016175496706, guid: 42e1d769644be4644942b26ec6d1b6c2,
+        type: 3}
+      propertyPath: m_camera
+      value: 
+      objectReference: {fileID: 62113208}
+    - target: {fileID: 7728635016175496706, guid: 42e1d769644be4644942b26ec6d1b6c2,
+        type: 3}
+      propertyPath: widthPixelation
+      value: 240
+      objectReference: {fileID: 0}
+    - target: {fileID: 7728635016175496706, guid: 42e1d769644be4644942b26ec6d1b6c2,
+        type: 3}
+      propertyPath: heightPixelation
+      value: 135
+      objectReference: {fileID: 0}
     - target: {fileID: 8137617326458572321, guid: 42e1d769644be4644942b26ec6d1b6c2,
         type: 3}
       propertyPath: m_Name
@@ -1221,6 +1236,11 @@ PrefabInstance:
       objectReference: {fileID: 1562601017}
     - target: {fileID: 4072342132166148251, guid: 628fb04ac76807f4c806824ef31542d3,
         type: 3}
+      propertyPath: m_playerAudio
+      value: 
+      objectReference: {fileID: 1764761953}
+    - target: {fileID: 4072342132166148251, guid: 628fb04ac76807f4c806824ef31542d3,
+        type: 3}
       propertyPath: m_cameraFollow
       value: 
       objectReference: {fileID: 62113207}
@@ -1320,6 +1340,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aec32a06148518c4e9e4155d74de8b38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1764761953 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8972231492918132579, guid: 2ce12683ff3a3b545aba608330c28f49,
+    type: 3}
+  m_PrefabInstance: {fileID: 1562601016}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff93eb13b6bfb1e40abecda5539b04af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1798639467

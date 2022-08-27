@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 4072342132166148249}
   - component: {fileID: 4072342132166148251}
   - component: {fileID: 4072342132166148250}
+  - component: {fileID: 3208985371282284101}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -554,6 +555,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_player: {fileID: 0}
+  m_playerAudio: {fileID: 0}
   m_gridManager: {fileID: 4072342131812907593}
   debugLineAntCount: 0
   m_cameraFollow: {fileID: 0}
@@ -578,6 +580,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 567
   m_raySkin: 0.002
+--- !u!114 &3208985371282284101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4072342132166148248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be181aac8d59e3c41864319a66599c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4072342132860386935
 GameObject:
   m_ObjectHideFlags: 0
