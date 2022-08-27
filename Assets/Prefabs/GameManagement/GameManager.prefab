@@ -1094,7 +1094,7 @@ MonoBehaviour:
   m_defaultMusicMixer: {fileID: -5674619899814904342, guid: c189f493fdee8284ba231357c6ee7898,
     type: 2}
   m_pauseMenu: {fileID: 760991403991473984}
-  m_settingsPanel: {fileID: 0}
+  m_settingsPanel: {fileID: 164939920678491996}
   m_cameraFollow: {fileID: 0}
   m_camLookTarget: {fileID: 4072342131314515859}
   m_regularCamLerp: 0.1

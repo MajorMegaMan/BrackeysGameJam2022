@@ -141,6 +141,9 @@ MonoBehaviour:
   m_smoothLookTime: 0.1
   m_maxHeight: 3
   m_minHeight: 2
+  m_collisionLayers:
+    serializedVersion: 2
+    m_Bits: 119
 --- !u!114 &1296046505549382014
 MonoBehaviour:
   m_ObjectHideFlags: 0

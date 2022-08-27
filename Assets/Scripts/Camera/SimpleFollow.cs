@@ -18,6 +18,8 @@ public class SimpleFollow : MonoBehaviour
     [SerializeField] float m_maxHeight = 3.0f;
     [SerializeField] float m_minHeight = 2.0f;
 
+    [SerializeField] LayerMask m_collisionLayers = ~0;
+
     public float smoothPosTime { get { return m_smoothPosTime; } set { m_smoothPosTime = value; } }
     public float smoothLookTime { get { return m_smoothLookTime; } set { m_smoothLookTime = value; } }
 
@@ -28,7 +30,15 @@ public class SimpleFollow : MonoBehaviour
         {
             Vector3 toTarget = targetFollow.position - transform.position;
 
-            Vector3 targetPos = targetFollow.position - toTarget.normalized * distance;
+            Vector3 targetPos;
+            if(Physics.Raycast(targetFollow.position, -toTarget, out RaycastHit hitInfo, distance, m_collisionLayers, QueryTriggerInteraction.Ignore))
+            {
+                targetPos = hitInfo.point;
+            }
+            else
+            {
+                targetPos = targetFollow.position - toTarget.normalized * distance;
+            }
 
             Vector3 clampedPos = targetPos;
             clampedPos.y = Mathf.Clamp(clampedPos.y, m_minHeight + targetFollow.position.y, m_maxHeight + targetFollow.position.y);
