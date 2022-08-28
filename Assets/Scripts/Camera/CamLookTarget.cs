@@ -9,7 +9,7 @@ public class CamLookTarget : MonoBehaviour
     [SerializeField] Transform m_splitFollow;
 
     delegate void FollowDelegate();
-    FollowDelegate m_followDelegate;
+    FollowDelegate m_followDelegate = null;
 
     [SerializeField] bool m_modeIsSingle = true;
 
@@ -17,7 +17,10 @@ public class CamLookTarget : MonoBehaviour
 
     private void Awake()
     {
-        m_followDelegate = FollowSingle;
+        if(m_followDelegate == null)
+        {
+            m_followDelegate = FollowSingle;
+        }
     }
 
     // Start is called before the first frame update
@@ -57,6 +60,16 @@ public class CamLookTarget : MonoBehaviour
     public void SetFollowTarget(Transform followTarget)
     {
         m_followTarget = followTarget;
+    }
+
+    public Transform GetFollowTarget()
+    {
+        return m_followTarget;
+    }
+
+    public Transform GetSplitTarget()
+    {
+        return m_splitFollow;
     }
 
     private void OnValidate()

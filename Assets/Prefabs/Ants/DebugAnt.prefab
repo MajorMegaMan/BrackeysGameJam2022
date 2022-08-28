@@ -221,6 +221,7 @@ MonoBehaviour:
   m_collisionTrigger: {fileID: 4465274323351798192}
   m_antAnimator: {fileID: 6518713911919715861}
   m_ragdoll: {fileID: 4578918015133053455}
+  m_audio: {fileID: 2738648186783763507}
 --- !u!114 &6518713911919715861
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -42,7 +42,7 @@ MonoBehaviour:
   m_footSounds:
   - {fileID: 8300000, guid: 86605731c94861f4b8bdc0c3fb142e1d, type: 3}
   - {fileID: 8300000, guid: 517508f2edb339d4882fb819bd9bdf4d, type: 3}
-  m_antSoundVolume: 2
+  m_antSoundVolume: 8
   m_footPlayFrequency: 0.8
   m_footStepRandomTimeStep: 0.1
   m_footVolume: 0.4

@@ -11,6 +11,7 @@ public class AntSettings : ScriptableObject
 
     // Relative distance that ants will try to follow the player.
     [SerializeField] float m_followDistance = 2.0f;
+    [SerializeField] float m_followPathResetInterval = 0.2f;
 
     [Header("Building Variables")]
     // The height the ant will be considered when trying to build a bridge or ladder.
@@ -52,6 +53,7 @@ public class AntSettings : ScriptableObject
 
     public float pickUpRadius { get { return m_pickUpRadius; } }
     public float followDistance { get { return m_followDistance; } }
+    public float followPathResetInterval { get { return m_followPathResetInterval; } }
 
     public float singleBuildHeight { get { return m_singleBuildHeight; } }
     public float buildArriveDistance { get { return m_buildArrivedistance; } }

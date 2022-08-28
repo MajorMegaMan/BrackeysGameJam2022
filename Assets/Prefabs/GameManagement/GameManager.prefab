@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
+  m_sendNavigationEvents: 0
   m_DragThreshold: 10
 --- !u!114 &6799776144880155713
 MonoBehaviour:
@@ -602,7 +602,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 2
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
@@ -1094,12 +1094,16 @@ MonoBehaviour:
   m_defaultMusicMixer: {fileID: -5674619899814904342, guid: c189f493fdee8284ba231357c6ee7898,
     type: 2}
   m_pauseMenu: {fileID: 760991403991473984}
-  m_settingsPanel: {fileID: 0}
+  m_settingsPanel: {fileID: 164939920678491996}
   m_cameraFollow: {fileID: 0}
   m_camLookTarget: {fileID: 4072342131314515859}
   m_regularCamLerp: 0.1
   m_drawingCamLerp: 0.4
   m_mouseIndicator: {fileID: 4072342132950415875}
+  m_carryPlacementInvalidLayer:
+    serializedVersion: 2
+    m_Bits: 262679
+  m_boxShrinkDetector: 0.99
 --- !u!114 &4072342132166148250
 MonoBehaviour:
   m_ObjectHideFlags: 0

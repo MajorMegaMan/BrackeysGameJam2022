@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.AI;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] PlayerController m_player = null;
     [SerializeField] PlayerAudio m_playerAudio = null;
+    [SerializeField] PlayerAnimate m_playerAnimate = null;
     [SerializeField] GridManager m_gridManager = null;
 
     [SerializeField] AudioClip m_defaultMusicClip = null;
@@ -15,6 +17,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] MenuAnimationGroup m_pauseMenu = null;
     [SerializeField] MenuAnimationGroup m_settingsPanel = null;
+    [SerializeField] MenuAnimationGroup m_winPanel = null;
     bool m_gamePaused = false;
 
     PackagedStateMachine<GameManager> m_selectionStateMachine;
@@ -33,6 +36,15 @@ public class GameManager : MonoBehaviour
     CarryableObject m_carryableObject = null;
     Collider m_hoverCollider = null;
 
+    [Header("Selection")]
+    [SerializeField] LayerMask m_carryPlacementInvalidLayer = 0;
+
+    // This will shrink the size of the mouse indicator whne performing collider checks
+    [SerializeField] float m_boxShrinkDetector = 0.9f;
+
+    NavMeshPath m_startPath;
+    NavMeshPath m_endPath;
+
     // Singletons baby.
     static GameManager _instance = null;
     public static GameManager instance { get { return _instance; } }
@@ -46,6 +58,11 @@ public class GameManager : MonoBehaviour
     public AudioMixerGroup defaultMusicMixer { get { return m_defaultMusicMixer; } }
 
     public bool gamePaused { get { return m_gamePaused; } }
+
+    bool m_hasWon = false;
+    public bool hasWon { get { return m_hasWon; } }
+
+    float m_winTimer = 0.0f;
 
     private void Awake()
     {
@@ -78,6 +95,9 @@ public class GameManager : MonoBehaviour
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
 
         m_mouseIndicator.EnableText(false);
+
+        m_startPath = new NavMeshPath();
+        m_endPath = new NavMeshPath();
     }
 
     // Start is called before the first frame update
@@ -89,19 +109,9 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
         {
-            AntManager.instance.ClearBuildGroups();
-        }
-
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            AntManager.instance.ReleaseAllAnts();
-        }
-
-        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
-        {
-            if(m_gamePaused)
+            if (m_gamePaused)
             {
                 m_pauseMenu.BeginExit();
                 m_settingsPanel.BeginExit();
@@ -114,6 +124,27 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (hasWon == true)
+        {
+            m_winTimer += Time.deltaTime * Random.Range(0.5f, 1.0f);
+            if(m_winTimer > 5.0f)
+            {
+                m_winTimer -= 5.0f;
+                playerAudio.PlayPositiveAntSound();
+            }
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            AntManager.instance.ClearBuildGroups();
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            AntManager.instance.ReleaseAllAnts();
+        }
+
         if(!gamePaused)
         {
             m_mouseIndicator.CamRayCast();
@@ -123,12 +154,37 @@ public class GameManager : MonoBehaviour
 
     public bool InitiateAntBuild(Vector3 start, Vector3 end)
     {
-        return AntManager.instance.InitiateLineBuild(start, end);
+        bool validStartPath = NavMesh.SamplePosition(start, out NavMeshHit startNavHit, 2.0f, ~0);
+        if (validStartPath)
+        {
+            validStartPath = AntManager.instance.IsValidNavPath(player.transform.position, startNavHit.position, m_startPath);
+        }
+
+        bool validEndPath = NavMesh.SamplePosition(end, out NavMeshHit endNavHit, 2.0f, ~0);
+        if (validEndPath)
+        {
+            validEndPath = AntManager.instance.IsValidNavPath(player.transform.position, endNavHit.position, m_endPath);
+        }
+
+        if(!validEndPath && !validStartPath)
+        {
+            return false;
+        }
+
+        return AntManager.instance.InitiateLineBuild(start, end, m_startPath, m_endPath);
     }
 
     public void UpdateSelectorColour(int antCount, bool valid = true)
     {
-        m_mouseIndicator.SetSelectionColour(valid && antCount <= AntManager.instance.AvailableAntCount());
+        m_mouseIndicator.SetSelectionColour(valid && (antCount <= AntManager.instance.AvailableAntCount() && antCount != 0));
+    }
+
+    public void WinGame()
+    {
+        m_hasWon = true;
+        playerAudio.PlayPositiveAntSound();
+        m_playerAnimate.Dance();
+        m_winPanel.BeginEnter();
     }
 
     #region SelectionStates
@@ -153,11 +209,25 @@ public class GameManager : MonoBehaviour
         }
 
         // Find selection colour. for now just set to valid
-        m_mouseIndicator.SetSelectionColour(true);
+        bool validPath = NavMesh.SamplePosition(m_mouseIndicator.lastCellPosition, out NavMeshHit navHit, 2.0f, ~0);
+        if(validPath)
+        {
+            validPath = AntManager.instance.IsValidNavPath(player.transform.position, navHit.position, m_startPath);
+            validPath = m_startPath.status == NavMeshPathStatus.PathComplete;
+        }
+
+        m_mouseIndicator.SetSelectionColour(validPath);
 
         if (Input.GetMouseButtonDown(0))
         {
-            EmptyStateClick();
+            if(validPath)
+            {
+                EmptyStateClick();
+            }
+            else
+            {
+                playerAudio.PlayNegativeAntSound();
+            }
         }
     }
 
@@ -200,7 +270,6 @@ public class GameManager : MonoBehaviour
             ChangeToState(SelectionStateEnum.empty);
             return;
         }
-
 
         int antCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
         UpdateSelectorColour(antCount, validLineRay);
@@ -268,15 +337,36 @@ public class GameManager : MonoBehaviour
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
     }
 
+    Collider[] FindMouseColliders()
+    {
+        return Physics.OverlapBox(m_mouseIndicator.transform.position, m_mouseIndicator.transform.localScale * m_boxShrinkDetector * 0.5f, m_mouseIndicator.transform.rotation, m_carryPlacementInvalidLayer, QueryTriggerInteraction.Ignore);
+    }
+
     void InvokeDrawCarry()
     {
         m_mouseIndicator.SetEndDrawLine();
 
         m_mouseIndicator.UpdateTextForCarryObject(Camera.main.transform, m_carryableObject);
 
+        var colliders = FindMouseColliders();
+        bool isBlocked = colliders.Length > 0;
+
+        m_mouseIndicator.SetSelectionColour(!isBlocked);
+
         if (Input.GetMouseButtonUp(0))
         {
             // Try to apply ant object placement.
+            if(isBlocked)
+            {
+                for(int i = 0; i < colliders.Length; i++)
+                {
+                    Debug.Log(colliders[i].name);
+                }
+                playerAudio.PlayNegativeAntSound();
+                ChangeToState(SelectionStateEnum.empty);
+                return;
+            }
+
             if(AntManager.instance.SendGroupToCarryObject(m_carryableObject, m_mouseIndicator.transform.position, m_mouseIndicator.transform.rotation))
             {
                 playerAudio.PlayPositiveAntSound();

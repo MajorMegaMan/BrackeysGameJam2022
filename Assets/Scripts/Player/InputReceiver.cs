@@ -8,6 +8,11 @@ public class InputReceiver : MonoBehaviour
 
     public Vector3 GetMovement()
     {
+        if(GameManager.instance.gamePaused || GameManager.instance.hasWon)
+        {
+            return Vector3.zero;
+        }
+
         Vector3 movement = Vector3.zero;
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.z = Input.GetAxisRaw("Vertical");

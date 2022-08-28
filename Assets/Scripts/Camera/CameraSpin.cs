@@ -10,6 +10,8 @@ public class CameraSpin : MonoBehaviour
     Vector3 m_moveSmoothVel = Vector3.zero;
     [SerializeField] float m_moveSmoothTime = 0.1f;
 
+    public float camSpeed { get { return m_camSpeed; } set { m_camSpeed = value; } }
+
     // Start is called before the first frame update
     void Start()
     {

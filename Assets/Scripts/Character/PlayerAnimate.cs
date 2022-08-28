@@ -9,6 +9,8 @@ public class PlayerAnimate : MonoBehaviour
 
     [SerializeField] Transform m_modelTransform = null;
 
+    [SerializeField] string m_danceState = "Ant_Dance";
+
     void Start()
     {
         
@@ -24,5 +26,10 @@ public class PlayerAnimate : MonoBehaviour
             m_modelTransform.forward = heading;
         }
         m_characterAnimate.SetMovementParameter(m_player.currentSpeed / m_player.speed);
+    }
+
+    public void Dance()
+    {
+        m_characterAnimate.CrossFade(m_danceState, 0.1f);
     }
 }

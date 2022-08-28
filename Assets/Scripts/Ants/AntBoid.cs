@@ -11,6 +11,7 @@ public class AntBoid : MonoBehaviour
 
     Vector3 m_navTarget = Vector3.zero;
     Transform m_followTarget = null;
+    float m_followPathResetTimer = 0.0f;
 
     StateMachine<AntBoid> m_actionStateMachine;
     IState<AntBoid>[] m_actionStates;
@@ -23,6 +24,7 @@ public class AntBoid : MonoBehaviour
     // Building
     AntBuildingGroup m_currentBuildGroup = null;
     Vector3 m_climbPosition = Vector3.zero;
+    Vector3 m_climbDir = Vector3.zero;
 
     // Carrying
     CarryableObject m_currentCarryableObject = null;
@@ -32,6 +34,9 @@ public class AntBoid : MonoBehaviour
     // Animation
     [SerializeField] AntAnimate m_antAnimator = null;
     [SerializeField] RagdollAnimator m_ragdoll = null;
+
+    // Audio
+    [SerializeField] AntAudio m_audio = null;
 
     // Getters
     PlayerController player { get { return AntManager.instance.player; } }
@@ -44,6 +49,7 @@ public class AntBoid : MonoBehaviour
     public float speed { get { return m_speedGetter.Invoke(); } }
     public Vector3 velocity { get { return m_velocityGetter.Invoke(); } }
     public float currentSpeed { get { return GetCurrentSpeed(); } }
+
 
     private void Awake()
     {
@@ -99,6 +105,16 @@ public class AntBoid : MonoBehaviour
         return m_currentCarryableObject.velocity;
     }
 
+    float GetClimbSpeed()
+    {
+        return settings.climbSpeed;
+    }
+
+    Vector3 GetClimbVelocity()
+    {
+        return m_climbDir * GetClimbSpeed();
+    }
+
     void SetNavGettersToSelf()
     {
         m_speedGetter = GetNavSpeed;
@@ -109,6 +125,12 @@ public class AntBoid : MonoBehaviour
     {
         m_speedGetter = GetCarryNavSpeed;
         m_velocityGetter = GetCarryNavVelocity;
+    }
+
+    void SetNavGettersToClimb()
+    {
+        m_speedGetter = GetClimbSpeed;
+        m_velocityGetter = GetClimbVelocity;
     }
 
     #endregion // !Getters
@@ -138,7 +160,11 @@ public class AntBoid : MonoBehaviour
         }
         else
         {
-            if(m_currentState == StateEnum.climbing || m_currentState == StateEnum.frozen)
+            if(m_currentState == StateEnum.ragdoll)
+            {
+                // Do Nothing
+            }
+            else if(m_currentState == StateEnum.climbing || m_currentState == StateEnum.frozen)
             {
                 SetState(StateEnum.ragdoll);
             }
@@ -213,9 +239,22 @@ public class AntBoid : MonoBehaviour
     // Called during the update step of FollowState
     void MoveFollow()
     {
-        Vector3 toTarget = m_followTarget.position - transform.position;
-        SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
-        m_navAgent.SetDestination(m_navTarget);
+        m_followPathResetTimer += Time.deltaTime;
+        if(m_followPathResetTimer > settings.followPathResetInterval)
+        {
+            m_followPathResetTimer -= settings.followPathResetInterval;
+
+            Vector3 toTarget = m_followTarget.position - transform.position;
+            SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
+            m_navAgent.SetDestination(m_navTarget);
+
+
+            if (m_navAgent.pathStatus == NavMeshPathStatus.PathPartial || m_navAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+            {
+                // failed to reach player with a path
+                SetToWait();
+            }
+        }
     }
 
     void SetNavTarget(Vector3 navTarget)
@@ -249,6 +288,11 @@ public class AntBoid : MonoBehaviour
     {
         m_pickUpTrigger.gameObject.SetActive(false);
         SetFollowTarget(player.transform);
+        m_followPathResetTimer = 0.0f;
+
+        Vector3 toTarget = m_followTarget.position - transform.position;
+        SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
+        m_navAgent.SetDestination(m_navTarget);
     }
 
     internal void EnterBuilding()
@@ -333,6 +377,8 @@ public class AntBoid : MonoBehaviour
             owner.StartNavigating();
             owner.EnterFollowing();
 
+            owner.m_audio.PlayPositiveAntSound();
+
             AntManager.instance.AddToPlayerGroup(owner);
         }
 
@@ -398,12 +444,19 @@ public class AntBoid : MonoBehaviour
             Vector3 lineDir = owner.m_currentBuildGroup.GetLine().normalized;
             owner.transform.forward = lineDir;
 
+            owner.m_climbDir = lineDir;
+
             owner.m_antAnimator.Climb();
+            owner.m_antAnimator.SetHeadingYRemove(false);
+
+            owner.SetNavGettersToClimb();
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
             owner.m_antAnimator.Motion();
+            owner.SetNavGettersToSelf();
+            owner.m_antAnimator.SetHeadingYRemove(true);
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -479,10 +532,15 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
+            Vector3 targetPosition = m_hipsTransform.position;
             owner.m_ragdoll.Activate(false);
             //Vector3 offset = m_hipsTransform.localToWorldMatrix * m_hipsOffset;
             //owner.transform.position = m_hipsTransform.position + offset;
-            owner.transform.position = m_hipsTransform.position;
+
+            owner.StartNavigating();
+            Vector3 position = targetPosition;
+            owner.transform.position = position;
+            owner.m_navAgent.Warp(position);
 
             owner.m_collisionTrigger.gameObject.SetActive(true);
         }
@@ -547,4 +605,10 @@ public class AntBoid : MonoBehaviour
     }
 
     #endregion // !States
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward * 5.0f);
+    }
 }
