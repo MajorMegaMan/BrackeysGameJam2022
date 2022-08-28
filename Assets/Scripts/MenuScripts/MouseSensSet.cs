@@ -12,8 +12,16 @@ public class MouseSensSet : MonoBehaviour
 
     [SerializeField] ScriptableMouseSettings m_savedSettings;
 
+    static bool _isLoaded = false;
+
     private void Start()
     {
+        if (!_isLoaded)
+        {
+            _isLoaded = true;
+            m_savedSettings.mouseSens = PlayerPrefs.GetFloat("MouseSens", m_savedSettings.mouseSens);
+        }
+
         if (m_cameraSpin != null)
         {
             m_cameraSpin.camSpeed = m_savedSettings.mouseSens;
@@ -33,5 +41,10 @@ public class MouseSensSet : MonoBehaviour
         {
             m_cameraSpin.camSpeed = m_savedSettings.mouseSens;
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetFloat("MouseSens", m_savedSettings.mouseSens);
     }
 }

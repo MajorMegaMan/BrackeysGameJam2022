@@ -13,8 +13,18 @@ public class MixerVolumeSet : MonoBehaviour
     [SerializeField] Slider m_musicSlider;
     [SerializeField] Slider m_sfxSlider;
 
+    static bool _isLoaded = false;
+
     private void Start()
     {
+        if(!_isLoaded)
+        {
+            _isLoaded = true;
+            m_savedMixerVolumes.masterValue = PlayerPrefs.GetFloat("MasterVol", m_savedMixerVolumes.masterValue);
+            m_savedMixerVolumes.musicValue = PlayerPrefs.GetFloat("MusicVol", m_savedMixerVolumes.musicValue);
+            m_savedMixerVolumes.sfxValue = PlayerPrefs.GetFloat("SFXVol", m_savedMixerVolumes.sfxValue);
+        }
+
         m_masterSlider.value = m_savedMixerVolumes.masterValue;
         m_musicSlider.value = m_savedMixerVolumes.musicValue;
         m_sfxSlider.value = m_savedMixerVolumes.sfxValue;
@@ -56,5 +66,12 @@ public class MixerVolumeSet : MonoBehaviour
         {
             m_mixer.SetFloat(name, -80);
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetFloat("MasterVol", m_savedMixerVolumes.masterValue);
+        PlayerPrefs.SetFloat("MusicVol", m_savedMixerVolumes.musicValue);
+        PlayerPrefs.SetFloat("SFXVol", m_savedMixerVolumes.sfxValue);
     }
 }
