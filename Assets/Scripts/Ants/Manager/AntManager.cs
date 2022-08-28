@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.AI;
 
 public class AntManager : MonoBehaviour
 {
@@ -92,8 +93,67 @@ public class AntManager : MonoBehaviour
         }
     }
 
-    public bool InitiateLineBuild(Vector3 start, Vector3 end)
+    public bool IsValidNavPath(Vector3 source, Vector3 target, NavMeshPath path)
     {
+        return NavMesh.CalculatePath(source, target, ~0, path);
+    }
+
+    float PathLength(NavMeshPath path)
+    {
+        if (path.corners.Length < 2)
+            return 0;
+
+        Vector3 previousCorner = path.corners[0];
+        float lengthSoFar = 0.0F;
+        int i = 1;
+        while (i < path.corners.Length)
+        {
+            Vector3 currentCorner = path.corners[i];
+            lengthSoFar += Vector3.Distance(previousCorner, currentCorner);
+            previousCorner = currentCorner;
+            i++;
+        }
+        return lengthSoFar;
+    }
+
+    public bool InitiateLineBuild(Vector3 start, Vector3 end, NavMeshPath playerToStart, NavMeshPath playerToEnd)
+    {
+        bool validPathToStart = playerToStart.status == NavMeshPathStatus.PathComplete;
+        bool validPathToEnd = playerToEnd.status == NavMeshPathStatus.PathComplete;
+
+        if(validPathToStart && validPathToEnd)
+        {
+            // check which is closer
+            float startPathLength = PathLength(playerToStart);
+            float endPathLength = PathLength(playerToEnd);
+
+            if(endPathLength < startPathLength)
+            {
+                // switch if end is shorter
+                Vector3 temp = end;
+                end = start;
+                start = temp;
+            }
+        }
+        else if(validPathToStart)
+        {
+            // path to start valid
+            // can use standard line
+        }
+        else if(validPathToEnd)
+        {
+            // path to end valid
+            // switch the ends of the line
+            Vector3 temp = end;
+            end = start;
+            start = temp;
+        }
+        else
+        {
+            // no path is valid
+            return false;
+        }
+
         float lineLength = (end - start).magnitude;
         int antCount = CalculateLineAntCount(lineLength);
 
@@ -102,7 +162,7 @@ public class AntManager : MonoBehaviour
             return false;
         }
 
-        if (antCount <= AvailableAntCount())
+        if (antCount <= AvailableAntCount() && antCount != 0)
         {
             BridgeCollider newBridge = Instantiate(m_bridgeColliderPrefab, start, Quaternion.identity, transform);
             newBridge.SetBridgeLine(start, end);

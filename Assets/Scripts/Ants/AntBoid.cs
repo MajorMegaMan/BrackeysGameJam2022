@@ -11,6 +11,7 @@ public class AntBoid : MonoBehaviour
 
     Vector3 m_navTarget = Vector3.zero;
     Transform m_followTarget = null;
+    float m_followPathResetTimer = 0.0f;
 
     StateMachine<AntBoid> m_actionStateMachine;
     IState<AntBoid>[] m_actionStates;
@@ -34,6 +35,9 @@ public class AntBoid : MonoBehaviour
     [SerializeField] AntAnimate m_antAnimator = null;
     [SerializeField] RagdollAnimator m_ragdoll = null;
 
+    // Audio
+    [SerializeField] AntAudio m_audio = null;
+
     // Getters
     PlayerController player { get { return AntManager.instance.player; } }
     AntSettings settings { get { return AntManager.instance.settings; } }
@@ -45,6 +49,7 @@ public class AntBoid : MonoBehaviour
     public float speed { get { return m_speedGetter.Invoke(); } }
     public Vector3 velocity { get { return m_velocityGetter.Invoke(); } }
     public float currentSpeed { get { return GetCurrentSpeed(); } }
+
 
     private void Awake()
     {
@@ -234,9 +239,22 @@ public class AntBoid : MonoBehaviour
     // Called during the update step of FollowState
     void MoveFollow()
     {
-        Vector3 toTarget = m_followTarget.position - transform.position;
-        SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
-        m_navAgent.SetDestination(m_navTarget);
+        m_followPathResetTimer += Time.deltaTime;
+        if(m_followPathResetTimer > settings.followPathResetInterval)
+        {
+            m_followPathResetTimer -= settings.followPathResetInterval;
+
+            Vector3 toTarget = m_followTarget.position - transform.position;
+            SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
+            m_navAgent.SetDestination(m_navTarget);
+
+
+            if (m_navAgent.pathStatus == NavMeshPathStatus.PathPartial || m_navAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+            {
+                // failed to reach player with a path
+                SetToWait();
+            }
+        }
     }
 
     void SetNavTarget(Vector3 navTarget)
@@ -270,6 +288,11 @@ public class AntBoid : MonoBehaviour
     {
         m_pickUpTrigger.gameObject.SetActive(false);
         SetFollowTarget(player.transform);
+        m_followPathResetTimer = 0.0f;
+
+        Vector3 toTarget = m_followTarget.position - transform.position;
+        SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
+        m_navAgent.SetDestination(m_navTarget);
     }
 
     internal void EnterBuilding()
@@ -353,6 +376,8 @@ public class AntBoid : MonoBehaviour
         {
             owner.StartNavigating();
             owner.EnterFollowing();
+
+            owner.m_audio.PlayPositiveAntSound();
 
             AntManager.instance.AddToPlayerGroup(owner);
         }

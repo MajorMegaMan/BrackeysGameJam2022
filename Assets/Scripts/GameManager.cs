@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.AI;
 
 public class GameManager : MonoBehaviour
 {
@@ -32,6 +33,9 @@ public class GameManager : MonoBehaviour
     // Carry Hover
     CarryableObject m_carryableObject = null;
     Collider m_hoverCollider = null;
+
+    NavMeshPath m_startPath;
+    NavMeshPath m_endPath;
 
     // Singletons baby.
     static GameManager _instance = null;
@@ -78,6 +82,9 @@ public class GameManager : MonoBehaviour
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
 
         m_mouseIndicator.EnableText(false);
+
+        m_startPath = new NavMeshPath();
+        m_endPath = new NavMeshPath();
     }
 
     // Start is called before the first frame update
@@ -123,12 +130,29 @@ public class GameManager : MonoBehaviour
 
     public bool InitiateAntBuild(Vector3 start, Vector3 end)
     {
-        return AntManager.instance.InitiateLineBuild(start, end);
+        bool validStartPath = NavMesh.SamplePosition(start, out NavMeshHit startNavHit, 2.0f, ~0);
+        if (validStartPath)
+        {
+            validStartPath = AntManager.instance.IsValidNavPath(player.transform.position, startNavHit.position, m_startPath);
+        }
+
+        bool validEndPath = NavMesh.SamplePosition(end, out NavMeshHit endNavHit, 2.0f, ~0);
+        if (validEndPath)
+        {
+            validEndPath = AntManager.instance.IsValidNavPath(player.transform.position, endNavHit.position, m_endPath);
+        }
+
+        if(!validEndPath && !validStartPath)
+        {
+            return false;
+        }
+
+        return AntManager.instance.InitiateLineBuild(start, end, m_startPath, m_endPath);
     }
 
     public void UpdateSelectorColour(int antCount, bool valid = true)
     {
-        m_mouseIndicator.SetSelectionColour(valid && antCount <= AntManager.instance.AvailableAntCount());
+        m_mouseIndicator.SetSelectionColour(valid && (antCount <= AntManager.instance.AvailableAntCount() && antCount != 0));
     }
 
     #region SelectionStates
@@ -153,11 +177,25 @@ public class GameManager : MonoBehaviour
         }
 
         // Find selection colour. for now just set to valid
-        m_mouseIndicator.SetSelectionColour(true);
+        bool validPath = NavMesh.SamplePosition(m_mouseIndicator.lastCellPosition, out NavMeshHit navHit, 2.0f, ~0);
+        if(validPath)
+        {
+            validPath = AntManager.instance.IsValidNavPath(player.transform.position, navHit.position, m_startPath);
+            validPath = m_startPath.status != NavMeshPathStatus.PathPartial && m_startPath.status != NavMeshPathStatus.PathInvalid;
+        }
+
+        m_mouseIndicator.SetSelectionColour(validPath);
 
         if (Input.GetMouseButtonDown(0))
         {
-            EmptyStateClick();
+            if(validPath)
+            {
+                EmptyStateClick();
+            }
+            else
+            {
+                playerAudio.PlayNegativeAntSound();
+            }
         }
     }
 
@@ -200,7 +238,6 @@ public class GameManager : MonoBehaviour
             ChangeToState(SelectionStateEnum.empty);
             return;
         }
-
 
         int antCount = AntManager.instance.CalculateLineAntCount(m_mouseIndicator.GetLineStart(), m_mouseIndicator.GetLineEnd());
         UpdateSelectorColour(antCount, validLineRay);
