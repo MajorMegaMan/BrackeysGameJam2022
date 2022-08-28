@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] PlayerController m_player = null;
     [SerializeField] PlayerAudio m_playerAudio = null;
+    [SerializeField] PlayerAnimate m_playerAnimate = null;
     [SerializeField] GridManager m_gridManager = null;
 
     [SerializeField] AudioClip m_defaultMusicClip = null;
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] MenuAnimationGroup m_pauseMenu = null;
     [SerializeField] MenuAnimationGroup m_settingsPanel = null;
+    [SerializeField] MenuAnimationGroup m_winPanel = null;
     bool m_gamePaused = false;
 
     PackagedStateMachine<GameManager> m_selectionStateMachine;
@@ -56,6 +58,11 @@ public class GameManager : MonoBehaviour
     public AudioMixerGroup defaultMusicMixer { get { return m_defaultMusicMixer; } }
 
     public bool gamePaused { get { return m_gamePaused; } }
+
+    bool m_hasWon = false;
+    public bool hasWon { get { return m_hasWon; } }
+
+    float m_winTimer = 0.0f;
 
     private void Awake()
     {
@@ -102,19 +109,9 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
         {
-            AntManager.instance.ClearBuildGroups();
-        }
-
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            AntManager.instance.ReleaseAllAnts();
-        }
-
-        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
-        {
-            if(m_gamePaused)
+            if (m_gamePaused)
             {
                 m_pauseMenu.BeginExit();
                 m_settingsPanel.BeginExit();
@@ -125,6 +122,27 @@ public class GameManager : MonoBehaviour
                 m_pauseMenu.BeginEnter();
                 m_gamePaused = true;
             }
+        }
+
+        if (hasWon == true)
+        {
+            m_winTimer += Time.deltaTime * Random.Range(0.5f, 1.0f);
+            if(m_winTimer > 5.0f)
+            {
+                m_winTimer -= 5.0f;
+                playerAudio.PlayPositiveAntSound();
+            }
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            AntManager.instance.ClearBuildGroups();
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            AntManager.instance.ReleaseAllAnts();
         }
 
         if(!gamePaused)
@@ -159,6 +177,14 @@ public class GameManager : MonoBehaviour
     public void UpdateSelectorColour(int antCount, bool valid = true)
     {
         m_mouseIndicator.SetSelectionColour(valid && (antCount <= AntManager.instance.AvailableAntCount() && antCount != 0));
+    }
+
+    public void WinGame()
+    {
+        m_hasWon = true;
+        playerAudio.PlayPositiveAntSound();
+        m_playerAnimate.Dance();
+        m_winPanel.BeginEnter();
     }
 
     #region SelectionStates

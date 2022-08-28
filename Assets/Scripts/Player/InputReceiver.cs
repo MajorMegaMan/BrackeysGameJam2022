@@ -8,7 +8,7 @@ public class InputReceiver : MonoBehaviour
 
     public Vector3 GetMovement()
     {
-        if(GameManager.instance.gamePaused)
+        if(GameManager.instance.gamePaused || GameManager.instance.hasWon)
         {
             return Vector3.zero;
         }
