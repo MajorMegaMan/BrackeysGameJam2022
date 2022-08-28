@@ -479,10 +479,15 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
+            Vector3 targetPosition = m_hipsTransform.position;
             owner.m_ragdoll.Activate(false);
             //Vector3 offset = m_hipsTransform.localToWorldMatrix * m_hipsOffset;
             //owner.transform.position = m_hipsTransform.position + offset;
-            owner.transform.position = m_hipsTransform.position;
+
+            owner.StartNavigating();
+            Vector3 position = targetPosition;
+            owner.transform.position = position;
+            owner.m_navAgent.Warp(position);
 
             owner.m_collisionTrigger.gameObject.SetActive(true);
         }
