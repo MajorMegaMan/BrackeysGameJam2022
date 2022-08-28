@@ -34,6 +34,12 @@ public class GameManager : MonoBehaviour
     CarryableObject m_carryableObject = null;
     Collider m_hoverCollider = null;
 
+    [Header("Selection")]
+    [SerializeField] LayerMask m_carryPlacementInvalidLayer = 0;
+
+    // This will shrink the size of the mouse indicator whne performing collider checks
+    [SerializeField] float m_boxShrinkDetector = 0.9f;
+
     NavMeshPath m_startPath;
     NavMeshPath m_endPath;
 
@@ -181,7 +187,7 @@ public class GameManager : MonoBehaviour
         if(validPath)
         {
             validPath = AntManager.instance.IsValidNavPath(player.transform.position, navHit.position, m_startPath);
-            validPath = m_startPath.status != NavMeshPathStatus.PathPartial && m_startPath.status != NavMeshPathStatus.PathInvalid;
+            validPath = m_startPath.status == NavMeshPathStatus.PathComplete;
         }
 
         m_mouseIndicator.SetSelectionColour(validPath);
@@ -305,15 +311,36 @@ public class GameManager : MonoBehaviour
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
     }
 
+    Collider[] FindMouseColliders()
+    {
+        return Physics.OverlapBox(m_mouseIndicator.transform.position, m_mouseIndicator.transform.localScale * m_boxShrinkDetector * 0.5f, m_mouseIndicator.transform.rotation, m_carryPlacementInvalidLayer, QueryTriggerInteraction.Ignore);
+    }
+
     void InvokeDrawCarry()
     {
         m_mouseIndicator.SetEndDrawLine();
 
         m_mouseIndicator.UpdateTextForCarryObject(Camera.main.transform, m_carryableObject);
 
+        var colliders = FindMouseColliders();
+        bool isBlocked = colliders.Length > 0;
+
+        m_mouseIndicator.SetSelectionColour(!isBlocked);
+
         if (Input.GetMouseButtonUp(0))
         {
             // Try to apply ant object placement.
+            if(isBlocked)
+            {
+                for(int i = 0; i < colliders.Length; i++)
+                {
+                    Debug.Log(colliders[i].name);
+                }
+                playerAudio.PlayNegativeAntSound();
+                ChangeToState(SelectionStateEnum.empty);
+                return;
+            }
+
             if(AntManager.instance.SendGroupToCarryObject(m_carryableObject, m_mouseIndicator.transform.position, m_mouseIndicator.transform.rotation))
             {
                 playerAudio.PlayPositiveAntSound();

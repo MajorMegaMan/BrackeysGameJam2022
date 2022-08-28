@@ -1100,6 +1100,10 @@ MonoBehaviour:
   m_regularCamLerp: 0.1
   m_drawingCamLerp: 0.4
   m_mouseIndicator: {fileID: 4072342132950415875}
+  m_carryPlacementInvalidLayer:
+    serializedVersion: 2
+    m_Bits: 262679
+  m_boxShrinkDetector: 0.99
 --- !u!114 &4072342132166148250
 MonoBehaviour:
   m_ObjectHideFlags: 0
