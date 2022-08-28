@@ -1739,14 +1739,15 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1506308868}
   m_Father: {fileID: 266894450}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000018777077}
-  m_SizeDelta: {x: 0, y: 300}
+  m_AnchoredPosition: {x: 0, y: 0.000042211504}
+  m_SizeDelta: {x: 0, y: 1403.614}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &891901356
 GameObject:
@@ -3429,8 +3430,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 522325114}
   m_HandleRect: {fileID: 522325113}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.45810315
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3594,7 +3595,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4075,6 +4076,157 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42e1d769644be4644942b26ec6d1b6c2, type: 3}
+--- !u!1001 &1506308867
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 884942597}
+    m_Modifications:
+    - target: {fileID: 6919765404719347241, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_text
+      value: "Creators:\nLucas Petersen\n\t-Programming\n\t-Concept\n\nJeffery Bulseco\n\t-Ant
+        Model and Animations\n\nJessica Stanjo\n\t- Leaves Models\n\nMusic:\n\"Townie
+        Loop\" Kevin MacLeod (incompetech.com)\r\nLicensed under Creative Commons:
+        By Attribution 4.0 License\r\nhttp://creativecommons.org/licenses/by/4.0/\n\nSounds:\nGenerated
+        from ChipTune\nhttps://sfbgames.itch.io/chiptone\n\n\nUnity Asset Store\nAsset:
+        Cobblestone Texture - Tileable\nAuthor: George Panayiotou - SinglePixel.Soft\n\nAsset:
+        Hand Painted Seamless Wood Texture Vol - 6\nAuthor: Innovana Games\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347241, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347241, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_fontSizeBase
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347241, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919765404719347247, guid: 036c3ef27bba74946aeee162b97d5e9d,
+        type: 3}
+      propertyPath: m_Name
+      value: Credits Text (TMP)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 036c3ef27bba74946aeee162b97d5e9d, type: 3}
+--- !u!224 &1506308868 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6919765404719347246, guid: 036c3ef27bba74946aeee162b97d5e9d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1506308867}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1511114090
 GameObject:
   m_ObjectHideFlags: 0
