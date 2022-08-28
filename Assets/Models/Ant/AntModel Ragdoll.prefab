@@ -247,8 +247,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.43, y: 0.8, z: 0.47}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.9, y: 3.24, z: 1.23}
+  m_Center: {x: 0, y: -0.28, z: 0}
 --- !u!95 &2799382041029629276 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 3813534065278202479, guid: f437f2d85ea847543be2ec5af4d7dabb,
@@ -261,6 +261,19 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1311957226296960819}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7736145163546475087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8895343026702931356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6776b9d12366a8240a9da83bc21116b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ragdoll: {fileID: 8410137654549172602}
 --- !u!114 &8410137654549172602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,16 +293,3 @@ MonoBehaviour:
   m_onRagdollChange:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7736145163546475087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8895343026702931356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6776b9d12366a8240a9da83bc21116b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ragdoll: {fileID: 8410137654549172602}

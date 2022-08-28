@@ -12,6 +12,8 @@ public class AntAnimate : MonoBehaviour
     [SerializeField] float m_normalisedTransitionTime = 0.05f;
     [SerializeField] float m_headingAllowance = 0.001f;
 
+    bool m_removeYHeading = true;
+
     void Start()
     {
 
@@ -27,11 +29,19 @@ public class AntAnimate : MonoBehaviour
         m_characterAnimate.CrossFade(1, m_normalisedTransitionTime);
     }
 
+    public void SetHeadingYRemove(bool shouldRemoveY)
+    {
+        m_removeYHeading = shouldRemoveY;
+    }
+
     // Update is called once per frame
     void LateUpdate()
     {
         Vector3 heading = m_ant.velocity;
-        heading.y = 0;
+        if(m_removeYHeading)
+        {
+            heading.y = 0;
+        }
         if (heading.sqrMagnitude > m_headingAllowance)
         {
             m_modelTransform.forward = heading;

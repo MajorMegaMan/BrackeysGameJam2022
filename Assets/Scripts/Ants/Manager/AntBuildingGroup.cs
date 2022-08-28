@@ -67,7 +67,7 @@ public class AntBuildingGroup
 
     public Vector3 CalculateClimbPosition()
     {
-        return Vector3.Lerp(start, end, m_frozenList.Count / (float)m_antLineCount);
+        return Vector3.LerpUnclamped(start, end, (m_frozenList.Count + 0.5f) / (float)m_antLineCount);
     }
 
     public void SendNextAntToClimbPosition()

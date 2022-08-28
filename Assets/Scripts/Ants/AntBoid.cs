@@ -23,6 +23,7 @@ public class AntBoid : MonoBehaviour
     // Building
     AntBuildingGroup m_currentBuildGroup = null;
     Vector3 m_climbPosition = Vector3.zero;
+    Vector3 m_climbDir = Vector3.zero;
 
     // Carrying
     CarryableObject m_currentCarryableObject = null;
@@ -99,6 +100,16 @@ public class AntBoid : MonoBehaviour
         return m_currentCarryableObject.velocity;
     }
 
+    float GetClimbSpeed()
+    {
+        return settings.climbSpeed;
+    }
+
+    Vector3 GetClimbVelocity()
+    {
+        return m_climbDir * GetClimbSpeed();
+    }
+
     void SetNavGettersToSelf()
     {
         m_speedGetter = GetNavSpeed;
@@ -109,6 +120,12 @@ public class AntBoid : MonoBehaviour
     {
         m_speedGetter = GetCarryNavSpeed;
         m_velocityGetter = GetCarryNavVelocity;
+    }
+
+    void SetNavGettersToClimb()
+    {
+        m_speedGetter = GetClimbSpeed;
+        m_velocityGetter = GetClimbVelocity;
     }
 
     #endregion // !Getters
@@ -138,7 +155,11 @@ public class AntBoid : MonoBehaviour
         }
         else
         {
-            if(m_currentState == StateEnum.climbing || m_currentState == StateEnum.frozen)
+            if(m_currentState == StateEnum.ragdoll)
+            {
+                // Do Nothing
+            }
+            else if(m_currentState == StateEnum.climbing || m_currentState == StateEnum.frozen)
             {
                 SetState(StateEnum.ragdoll);
             }
@@ -398,12 +419,19 @@ public class AntBoid : MonoBehaviour
             Vector3 lineDir = owner.m_currentBuildGroup.GetLine().normalized;
             owner.transform.forward = lineDir;
 
+            owner.m_climbDir = lineDir;
+
             owner.m_antAnimator.Climb();
+            owner.m_antAnimator.SetHeadingYRemove(false);
+
+            owner.SetNavGettersToClimb();
         }
 
         void IState<AntBoid>.Exit(AntBoid owner)
         {
             owner.m_antAnimator.Motion();
+            owner.SetNavGettersToSelf();
+            owner.m_antAnimator.SetHeadingYRemove(true);
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -552,4 +580,10 @@ public class AntBoid : MonoBehaviour
     }
 
     #endregion // !States
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward * 5.0f);
+    }
 }
