@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
 
     Vector3 m_velocity = Vector3.zero;
     float m_currentSpeed = 0.0f;
+    Vector3 m_heading = Vector3.forward;
 
     // Ground Checking
     [SerializeField] float m_groundRayDistance = 0.02f;
@@ -30,6 +31,12 @@ public class PlayerController : MonoBehaviour
     public float speed { get { return m_speed; } }
     public Vector3 velocity { get { return m_velocity; } }
     public float currentSpeed { get { return m_currentSpeed; } }
+    public Vector3 heading { get { return m_heading; } }
+
+    // totalVelocity is the movement velocity + vertical Velocity
+    public Vector3 totalVelocity { get { return m_velocity + Vector3.up * m_verticalVelocity; } }
+
+    public Vector3 groundNormal { get { return m_groundNormal; } }
 
     public bool isGrounded { get { return m_groundedStateMachine.GetCurrentState() == GroundedStateEnum.grounded; } }
 
@@ -70,16 +77,20 @@ public class PlayerController : MonoBehaviour
         Vector3 moveDir = m_moveInput;
         if (isGrounded)
         {
-            //moveDir = Vector3.ProjectOnPlane(moveDir, m_groundNormal);
+            // Redirect movement based on the ground normal
             Quaternion normalRot = Quaternion.FromToRotation(Vector3.up, m_groundNormal);
             moveDir = normalRot * moveDir;
-            Debug.DrawLine(transform.position, transform.position + moveDir * m_speed, Color.yellow);
         }
 
         m_velocity = moveDir * m_speed;
 
         Vector3 moveVector = m_velocity + Vector3.up * m_verticalVelocity;
         m_currentSpeed = m_velocity.magnitude;
+
+        if(m_currentSpeed != 0.0f)
+        {
+            m_heading = m_velocity / m_currentSpeed;
+        }
 
         m_characterControl.Move(moveVector * Time.deltaTime);
     }
@@ -158,7 +169,7 @@ public class PlayerController : MonoBehaviour
     {
         void IState<PlayerController>.Enter(PlayerController owner)
         {
-
+            owner.m_groundNormal = Vector3.up;
         }
 
         void IState<PlayerController>.Exit(PlayerController owner)
