@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
     Vector3 CalculateHeightOffset()
     {
         float halfHeight = m_characterControl.height * 0.5f;
-        Vector3 heightOffset = Vector3.up * (halfHeight - m_characterControl.radius);
+        Vector3 heightOffset = Vector3.up * Mathf.Max((halfHeight - m_characterControl.radius), 0.0f); // height offset cannot be negative.
         return heightOffset;
     }
 
@@ -87,5 +87,18 @@ public class PlayerController : MonoBehaviour
     void GetInputs()
     {
         m_moveInput = inputReceiver.GetMovement();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Vector3 heightOffset = CalculateHeightOffset();
+
+        Vector3 bottom = m_characterControl.center - heightOffset;
+        Vector3 top = m_characterControl.center + heightOffset;
+        bottom += transform.position;
+        top += transform.position;
+
+        Gizmos.DrawSphere(bottom, m_characterControl.radius);
+        Gizmos.DrawSphere(top, m_characterControl.radius);
     }
 }
