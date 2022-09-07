@@ -24,9 +24,35 @@ public class PlayerController : MonoBehaviour
 
     float m_verticalVelocity = 0.0f;
 
+    PackagedStateMachine<PlayerController> m_groundedStateMachine;
+    RaycastHit m_lastGroundHit;
+
     public float speed { get { return m_speed; } }
     public Vector3 velocity { get { return m_velocity; } }
     public float currentSpeed { get { return m_currentSpeed; } }
+
+    public bool isGrounded { get { return m_groundedStateMachine.GetCurrentState() == GroundedStateEnum.grounded; } }
+
+    public float debugGroundDistance = 0.0f;
+
+    private void Awake()
+    {
+        var enumArray = System.Enum.GetValues(typeof(GroundedStateEnum));
+        IState<PlayerController>[] groundedStates = new IState<PlayerController>[enumArray.Length];
+        groundedStates[(int)GroundedStateEnum.grounded] = new GroundedState();
+        groundedStates[(int)GroundedStateEnum.airborne] = new AirborneState();
+
+        m_groundedStateMachine = new PackagedStateMachine<PlayerController>(this, groundedStates);
+
+        if(CheckForGroundUpdate())
+        {
+            m_groundedStateMachine.InitialiseState(GroundedStateEnum.grounded);
+        }
+        else
+        {
+            m_groundedStateMachine.InitialiseState(GroundedStateEnum.airborne);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -39,22 +65,15 @@ public class PlayerController : MonoBehaviour
     {
         GetInputs();
 
-        bool isGrounded = false;
-        if(!CheckForGround(out RaycastHit hitInfo))
-        {
-            m_verticalVelocity += m_gravity * Time.deltaTime;
-        }
-        else
-        {
-            m_verticalVelocity = 0.0f;
-            m_groundNormal = hitInfo.normal;
-            isGrounded = true;
-        }
+        m_groundedStateMachine.Invoke();
 
         Vector3 moveDir = m_moveInput;
         if (isGrounded)
         {
             //moveDir = Vector3.ProjectOnPlane(moveDir, m_groundNormal);
+            Quaternion normalRot = Quaternion.FromToRotation(Vector3.up, m_groundNormal);
+            moveDir = normalRot * moveDir;
+            Debug.DrawLine(transform.position, transform.position + moveDir * m_speed, Color.yellow);
         }
 
         m_velocity = moveDir * m_speed;
@@ -84,21 +103,106 @@ public class PlayerController : MonoBehaviour
         return Physics.CapsuleCast(bottom, top, m_characterControl.radius, Vector3.down, out hitInfo, m_groundRayDistance + m_characterControl.skinWidth, m_groundLayer, QueryTriggerInteraction.Ignore);
     }
 
+    // checks for ground and updates the last ground hit
+    bool CheckForGroundUpdate()
+    {
+        bool groundCheck = CheckForGround(out RaycastHit hitInfo);
+        m_lastGroundHit = hitInfo;
+        return groundCheck;
+    }
+
     void GetInputs()
     {
         m_moveInput = inputReceiver.GetMovement();
     }
 
-    private void OnDrawGizmos()
+    #region GroundedStates
+
+    public enum GroundedStateEnum
     {
-        Vector3 heightOffset = CalculateHeightOffset();
+        grounded,
+        airborne
+    }
 
-        Vector3 bottom = m_characterControl.center - heightOffset;
-        Vector3 top = m_characterControl.center + heightOffset;
-        bottom += transform.position;
-        top += transform.position;
+    class GroundedState : IState<PlayerController>
+    {
+        void IState<PlayerController>.Enter(PlayerController owner)
+        {
+            owner.m_verticalVelocity = 0.0f;
+            owner.m_groundNormal = owner.m_lastGroundHit.normal;
 
-        Gizmos.DrawSphere(bottom, m_characterControl.radius);
-        Gizmos.DrawSphere(top, m_characterControl.radius);
+            // Force the character to collide with the ground and snap to the skin width
+            owner.m_characterControl.Move(-owner.m_groundNormal * owner.m_characterControl.skinWidth);
+        }
+
+        void IState<PlayerController>.Exit(PlayerController owner)
+        {
+
+        }
+
+        void IState<PlayerController>.Invoke(PlayerController owner)
+        {
+            if (owner.CheckForGroundUpdate())
+            {
+                owner.m_groundNormal = owner.m_lastGroundHit.normal;
+            }
+            else
+            {
+                owner.m_verticalVelocity += owner.m_gravity * Time.deltaTime;
+                owner.m_groundedStateMachine.ChangeToState(GroundedStateEnum.airborne);
+            }
+        }
+    }
+
+    class AirborneState : IState<PlayerController>
+    {
+        void IState<PlayerController>.Enter(PlayerController owner)
+        {
+
+        }
+
+        void IState<PlayerController>.Exit(PlayerController owner)
+        {
+
+        }
+
+        void IState<PlayerController>.Invoke(PlayerController owner)
+        {
+            if (owner.CheckForGroundUpdate())
+            {
+                if (owner.m_lastGroundHit.distance < owner.m_characterControl.skinWidth + owner.m_groundRayDistance)
+                {
+                    owner.m_groundedStateMachine.ChangeToState(GroundedStateEnum.grounded);
+                }
+                else
+                {
+                    owner.m_verticalVelocity += owner.m_gravity * Time.deltaTime;
+                }
+            }
+            else
+            {
+                owner.m_verticalVelocity += owner.m_gravity * Time.deltaTime;
+            }
+        }
+    }
+
+    #endregion // ! GroundedStates
+}
+
+public static class PackagedSMExtensionPlayer
+{
+    public static void InitialiseState(this PackagedStateMachine<PlayerController> packagedStateMachine, PlayerController.GroundedStateEnum selectionState)
+    {
+        packagedStateMachine.InitialiseState((int)selectionState);
+    }
+
+    public static void ChangeToState(this PackagedStateMachine<PlayerController> packagedStateMachine, PlayerController.GroundedStateEnum selectionState)
+    {
+        packagedStateMachine.ChangeToState((int)selectionState);
+    }
+
+    public static PlayerController.GroundedStateEnum GetCurrentState(this PackagedStateMachine<PlayerController> packagedStateMachine)
+    {
+        return (PlayerController.GroundedStateEnum)packagedStateMachine.currentIndex;
     }
 }
