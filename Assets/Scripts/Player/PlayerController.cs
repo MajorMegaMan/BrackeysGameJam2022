@@ -40,8 +40,6 @@ public class PlayerController : MonoBehaviour
 
     public bool isGrounded { get { return m_groundedStateMachine.GetCurrentState() == GroundedStateEnum.grounded; } }
 
-    public float debugGroundDistance = 0.0f;
-
     private void Awake()
     {
         var enumArray = System.Enum.GetValues(typeof(GroundedStateEnum));

@@ -34,7 +34,7 @@ public class PlayerAnimate : MonoBehaviour
         }
         else
         {
-            lookDir = Vector3.Slerp(m_player.heading, m_player.totalVelocity.normalized, 0.5f);
+            lookDir = Vector3.Slerp(m_player.heading, m_player.totalVelocity.normalized, m_aerialSlerp);
         }
 
         if(lookDir.sqrMagnitude != 0)
