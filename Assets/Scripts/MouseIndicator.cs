@@ -13,10 +13,12 @@ public class MouseIndicator : MonoBehaviour
     [SerializeField] float m_selectorDistance = 5.0f;
 
     [SerializeField] LayerMask m_carryObjectLayerMask = 0;
+    [SerializeField] LayerMask m_bridgeLayerMask = 0;
 
     [SerializeField] MeshRenderer m_meshRenderer;
     [SerializeField] Color m_validColour = Color.green;
     [SerializeField] Color m_invalidColour = Color.red;
+    [SerializeField] Color m_bridgeColour = Color.yellow;
     [SerializeField] float m_coverSkinWidth = 0.1f;
 
     [Header("UI")]
@@ -42,7 +44,7 @@ public class MouseIndicator : MonoBehaviour
 
     private void Start()
     {
-        SetSelectionColour(true);
+        SetSelectionColour(SelectionColour.valid);
     }
 
     public bool CamRayCast()
@@ -102,15 +104,32 @@ public class MouseIndicator : MonoBehaviour
         }
     }
 
-    public void CoverLastHitCollider()
+    public void CoverLastHitCarriableCollider()
     {
         SetPositionToLastHitCollider();
         SetSelectorScale(m_lastHitCollider.bounds.size + Vector3.one * m_coverSkinWidth);
     }
 
+    public void CoverLastHitBridgeCollider()
+    {
+        SetPositionToLastHitCollider();
+        var capsuleCollider = ((CapsuleCollider)m_lastHitCollider);
+        Vector3 centerOffset = m_lastHitCollider.transform.localToWorldMatrix * capsuleCollider.center;
+        transform.position += centerOffset;
+        transform.up = m_lastHitCollider.transform.up;
+        Vector3 localScale = transform.localScale;
+        localScale.y = capsuleCollider.height;
+        transform.localScale = localScale;
+    }
+
     public bool IsLastHitColliderCarriable()
     {
         return m_lastHitCollider != null && Utility.ContainsLayer(m_lastHitCollider.gameObject.layer, m_carryObjectLayerMask);
+    }
+
+    public bool IsLastHitColliderBridge()
+    {
+        return m_lastHitCollider != null && Utility.ContainsLayer(m_lastHitCollider.gameObject.layer, m_bridgeLayerMask);
     }
 
     public void SetSelectorScale(Vector3 scale)
@@ -163,23 +182,54 @@ public class MouseIndicator : MonoBehaviour
         return result;
     }
 
-    public void SetSelectionColour(bool isValid)
+    public enum SelectionColour
+    {
+        valid,
+        inValid,
+        bridge
+    }
+
+    public void SetSelectionColour(SelectionColour selectionColour)
     {
         Color baseColour = m_selectorMaterial.GetColor("_Colour");
         Color lineColour = m_selectorMaterial.GetColor("_LineColour");
-        if (isValid)
+
+        switch(selectionColour)
         {
-            baseColour = CopyRGB(m_validColour, baseColour.a);
-            lineColour = CopyRGB(m_validColour, lineColour.a);
-        }
-        else
-        {
-            baseColour = CopyRGB(m_invalidColour, baseColour.a);
-            lineColour = CopyRGB(m_invalidColour, lineColour.a);
+            case SelectionColour.valid:
+                {
+                    baseColour = CopyRGB(m_validColour, baseColour.a);
+                    lineColour = CopyRGB(m_validColour, lineColour.a);
+                    break;
+                }
+            case SelectionColour.inValid:
+                {
+                    baseColour = CopyRGB(m_invalidColour, baseColour.a);
+                    lineColour = CopyRGB(m_invalidColour, lineColour.a);
+                    break;
+                }
+            case SelectionColour.bridge:
+                {
+                    baseColour = CopyRGB(m_bridgeColour, baseColour.a);
+                    lineColour = CopyRGB(m_bridgeColour, lineColour.a);
+                    break;
+                }
         }
 
         m_selectorMaterial.SetColor("_Colour", baseColour);
         m_selectorMaterial.SetColor("_LineColour", lineColour);
+    }
+
+    public void SetSelectionColour(bool isValid)
+    {
+        if(isValid)
+        {
+            SetSelectionColour(SelectionColour.valid);
+        }
+        else
+        {
+            SetSelectionColour(SelectionColour.inValid);
+        }
     }
 
     public void EnableText(bool enabled)
@@ -228,7 +278,7 @@ public class MouseIndicator : MonoBehaviour
     {
         if(Application.isPlaying && m_selectorMaterial != null)
         {
-            SetSelectionColour(true);
+            SetSelectionColour(SelectionColour.valid);
         }
     }
 }

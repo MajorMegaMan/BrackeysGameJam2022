@@ -28,6 +28,7 @@ public class AntBuildingGroup
 
         m_bridgeCollider = bridgeCollider;
         m_bridgeCollider.gameObject.SetActive(false);
+        m_bridgeCollider.SetBuildingGroup(this);
     }
 
     public void AddAntToGroup(AntBoid antBoid)
@@ -67,7 +68,12 @@ public class AntBuildingGroup
 
     public Vector3 CalculateClimbPosition()
     {
-        return Vector3.LerpUnclamped(start, end, (m_frozenList.Count + 0.5f) / (float)m_antLineCount);
+        Vector3 linePos = Vector3.LerpUnclamped(start, end, (m_frozenList.Count + 0.5f) / (float)m_antLineCount);
+
+        Vector3 offsetDir = Vector3.Cross(GetLine(), Vector3.up);
+        offsetDir = Vector3.Cross(GetLine(), offsetDir);
+
+        return linePos + offsetDir.normalized * AntManager.instance.settings.bridgeOffsetDistance;
     }
 
     public void SendNextAntToClimbPosition()
@@ -90,7 +96,7 @@ public class AntBuildingGroup
         m_waitingToBuildQueue.Clear();
         m_frozenList.Clear();
 
-        m_bridgeCollider.Disassemble();
+        m_bridgeCollider.DestroyBridge();
 
         AntManager.instance.RemoveBuildGroup(this);
     }

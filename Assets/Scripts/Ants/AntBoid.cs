@@ -136,7 +136,7 @@ public class AntBoid : MonoBehaviour
     #endregion // !Getters
 
     // Should be called by the pick up Trigger event
-    public void PlayerPickUpTriggerEvent()
+    public void FollowPlayer()
     {
         SetState(StateEnum.following);
     }
@@ -170,7 +170,8 @@ public class AntBoid : MonoBehaviour
             }
             else
             {
-                SetState(StateEnum.empty);
+                // Refollow the player
+                FollowPlayer();
             }
         }
     }
@@ -247,7 +248,6 @@ public class AntBoid : MonoBehaviour
             Vector3 toTarget = m_followTarget.position - transform.position;
             SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
             m_navAgent.SetDestination(m_navTarget);
-
 
             if (m_navAgent.pathStatus == NavMeshPathStatus.PathPartial || m_navAgent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
@@ -550,7 +550,8 @@ public class AntBoid : MonoBehaviour
                 m_timer += Time.deltaTime;
                 if (m_timer > owner.settings.ragdollRestTime)
                 {
-                    owner.SetState(StateEnum.empty);
+                    // Refolloew the player
+                    owner.FollowPlayer();
                 }
             }
         }

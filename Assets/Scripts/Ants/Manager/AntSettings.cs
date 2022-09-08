@@ -28,6 +28,8 @@ public class AntSettings : ScriptableObject
     // The distance the min distance from the target climb position before the ant will snap to position
     [SerializeField] float m_climbSnapDistance = 0.05f;
 
+    [SerializeField] float m_bridgeOffsetDistance = 0.5f;
+
     [Header("Ragdoll Variables")]
     [SerializeField] float m_ragdollRestTime = 2.0f;
     [SerializeField] float m_ragdollMinSpeedThreshold = 0.05f;
@@ -62,6 +64,7 @@ public class AntSettings : ScriptableObject
 
     public float climbSpeed { get { return m_climbSpeed; } }
     public float climbFinishDistance { get { return m_climbSnapDistance; } }
+    public float bridgeOffsetDistance { get { return m_bridgeOffsetDistance; } }
 
     public float ragdollRestTime { get { return m_ragdollRestTime; } }
     public float ragdollMinSpeedThreshold { get { return m_ragdollMinSpeedThreshold; } }

@@ -1088,6 +1088,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_player: {fileID: 0}
   m_playerAudio: {fileID: 0}
+  m_playerAnimate: {fileID: 0}
   m_gridManager: {fileID: 4072342131812907593}
   m_defaultMusicClip: {fileID: 8300000, guid: 9fd85f2b26f80844884010027972b299, type: 3}
   m_defaultMusicVolume: 0.15
@@ -1095,6 +1096,7 @@ MonoBehaviour:
     type: 2}
   m_pauseMenu: {fileID: 760991403991473984}
   m_settingsPanel: {fileID: 164939920678491996}
+  m_winPanel: {fileID: 0}
   m_cameraFollow: {fileID: 0}
   m_camLookTarget: {fileID: 4072342131314515859}
   m_regularCamLerp: 0.1
@@ -1119,7 +1121,7 @@ MonoBehaviour:
   m_camera: {fileID: 0}
   m_camRayLayer:
     serializedVersion: 2
-    m_Bits: 567
+    m_Bits: 262711
   m_raySkin: 0.002
 --- !u!1 &4072342132860386935
 GameObject:
@@ -1258,6 +1260,9 @@ MonoBehaviour:
   m_carryObjectLayerMask:
     serializedVersion: 2
     m_Bits: 512
+  m_bridgeLayerMask:
+    serializedVersion: 2
+    m_Bits: 262144
   m_meshRenderer: {fileID: 4072342132950415873}
   m_validColour: {r: 0, g: 1, b: 0, a: 1}
   m_invalidColour: {r: 1, g: 0, b: 0, a: 1}

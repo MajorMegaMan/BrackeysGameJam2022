@@ -135,16 +135,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            AntManager.instance.ClearBuildGroups();
-        }
-
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            AntManager.instance.ReleaseAllAnts();
-        }
-
         if(!gamePaused)
         {
             m_mouseIndicator.CamRayCast();
@@ -205,6 +195,12 @@ public class GameManager : MonoBehaviour
         if (m_mouseIndicator.IsLastHitColliderCarriable())
         {
             ChangeToState(SelectionStateEnum.hoverCarryObject);
+            return;
+        }
+
+        if (m_mouseIndicator.IsLastHitColliderBridge())
+        {
+            ChangeToState(SelectionStateEnum.hoverBridge);
             return;
         }
 
@@ -277,7 +273,7 @@ public class GameManager : MonoBehaviour
         m_mouseIndicator.UpdateTextForLine(Camera.main.transform, antCount);
     }
 
-    void EnterHover()
+    void EnterHoverCarry()
     {
         m_hoverCollider = m_mouseIndicator.lastHitCollider;
         m_carryableObject = m_hoverCollider.GetComponent<CarryableObject>();
@@ -285,7 +281,7 @@ public class GameManager : MonoBehaviour
         m_mouseIndicator.EnableText(true);
     }
 
-    void ExitHover()
+    void ExitHoverCarry()
     {
         if(m_selectionStateMachine.GetCurrentState() != SelectionStateEnum.drawCarryObject)
         {
@@ -297,7 +293,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void InvokeHover()
+    void InvokeHoverCarry()
     {
         if (m_mouseIndicator.lastHitCollider != m_hoverCollider)
         {
@@ -305,7 +301,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        m_mouseIndicator.CoverLastHitCollider();
+        m_mouseIndicator.CoverLastHitCarriableCollider();
 
         UpdateSelectorColour(m_carryableObject.antStrengthCount);
 
@@ -380,6 +376,39 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void EnterHoverBridge()
+    {
+        m_hoverCollider = m_mouseIndicator.lastHitCollider;
+
+        m_mouseIndicator.SetSelectionColour(MouseIndicator.SelectionColour.bridge);
+
+        m_mouseIndicator.CoverLastHitBridgeCollider();
+    }
+
+    void ExitHoverBridge()
+    {
+        m_mouseIndicator.SetSelectorScaleToGridCellSize();
+        m_mouseIndicator.transform.rotation = Quaternion.identity;
+    }
+
+    void InvokeHoverBridge()
+    {
+        if (m_mouseIndicator.lastHitCollider != m_hoverCollider)
+        {
+            ChangeToState(SelectionStateEnum.empty);
+            return;
+        }
+
+        m_mouseIndicator.CoverLastHitBridgeCollider();
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            var bridge = m_hoverCollider.GetComponent<BridgeCollider>();
+            bridge.Disassemble();
+            ChangeToState(SelectionStateEnum.empty);
+        }
+    }
+
     #endregion
 
     void InitialiseStateMachine()
@@ -391,6 +420,7 @@ public class GameManager : MonoBehaviour
         states[(int)SelectionStateEnum.drawing] = new DrawingState();
         states[(int)SelectionStateEnum.hoverCarryObject] = new HoverCarryObjectState();
         states[(int)SelectionStateEnum.drawCarryObject] = new DrawCarryObjectState();
+        states[(int)SelectionStateEnum.hoverBridge] = new HoverBridgeState();
 
         m_selectionStateMachine = new PackagedStateMachine<GameManager>(this, states);
 
@@ -402,7 +432,8 @@ public class GameManager : MonoBehaviour
         empty,
         drawing,
         hoverCarryObject,
-        drawCarryObject
+        drawCarryObject,
+        hoverBridge
     }
 
     class EmptyState : IState<GameManager>
@@ -445,17 +476,17 @@ public class GameManager : MonoBehaviour
     {
         void IState<GameManager>.Enter(GameManager owner)
         {
-            owner.EnterHover();
+            owner.EnterHoverCarry();
         }
 
         void IState<GameManager>.Exit(GameManager owner)
         {
-            owner.ExitHover();
+            owner.ExitHoverCarry();
         }
 
         void IState<GameManager>.Invoke(GameManager owner)
         {
-            owner.InvokeHover();
+            owner.InvokeHoverCarry();
         }
     }
 
@@ -474,6 +505,24 @@ public class GameManager : MonoBehaviour
         void IState<GameManager>.Invoke(GameManager owner)
         {
             owner.InvokeDrawCarry();
+        }
+    }
+
+    class HoverBridgeState : IState<GameManager>
+    {
+        void IState<GameManager>.Enter(GameManager owner)
+        {
+            owner.EnterHoverBridge();
+        }
+
+        void IState<GameManager>.Exit(GameManager owner)
+        {
+            owner.ExitHoverBridge();
+        }
+
+        void IState<GameManager>.Invoke(GameManager owner)
+        {
+            owner.InvokeHoverBridge();
         }
     }
     #endregion // !SelectionStates
