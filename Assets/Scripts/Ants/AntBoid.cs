@@ -447,7 +447,6 @@ public class AntBoid : MonoBehaviour
             owner.m_climbDir = lineDir;
 
             owner.m_antAnimator.Climb();
-            owner.m_antAnimator.SetHeadingYRemove(false);
 
             owner.SetNavGettersToClimb();
         }
@@ -456,7 +455,6 @@ public class AntBoid : MonoBehaviour
         {
             owner.m_antAnimator.Motion();
             owner.SetNavGettersToSelf();
-            owner.m_antAnimator.SetHeadingYRemove(true);
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
