@@ -215,7 +215,8 @@ public class AntBoid : MonoBehaviour
         if(otherRigid != null)
         {
             ActivateRagdoll();
-            m_ragdoll.GetRigidbody(0).AddForce(otherRigid.velocity, ForceMode.Impulse);
+            Vector3 vel = m_collisionTrigger.CalculateVelocity(otherRigid);
+            m_ragdoll.GetRigidbody(0).AddForce(vel, ForceMode.Impulse);
         }
     }
 

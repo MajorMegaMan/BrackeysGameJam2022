@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour
         m_cameraFollow.SetLookTarget(m_camLookTarget.transform);
         m_cameraFollow.SetTargetFollow(player.transform);
 
-        m_camLookTarget.SetFollowTarget(player.transform);
+        m_camLookTarget.SetFollowTarget(player.ragdoll.rigidBodies[0].transform);
         m_camLookTarget.SetMode(false);
         m_camLookTarget.splitLerpAmount = m_regularCamLerp;
 

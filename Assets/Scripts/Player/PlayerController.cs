@@ -28,6 +28,14 @@ public class PlayerController : MonoBehaviour
     PackagedStateMachine<PlayerController> m_groundedStateMachine;
     RaycastHit m_lastGroundHit;
 
+    [Header("Ragdoll")]
+    [SerializeField] RagdollAnimator m_ragdoll;
+    [SerializeField] CollisionTrigger m_collisionTrigger;
+
+    [SerializeField] float m_ragdollMinSpeedThreshold = 0.1f;
+    [SerializeField] float m_ragdollRestTime = 0.5f;
+
+
     public float speed { get { return m_speed; } }
     public Vector3 velocity { get { return m_velocity; } }
     public float currentSpeed { get { return m_currentSpeed; } }
@@ -40,12 +48,15 @@ public class PlayerController : MonoBehaviour
 
     public bool isGrounded { get { return m_groundedStateMachine.GetCurrentState() == GroundedStateEnum.grounded; } }
 
+    public RagdollAnimator ragdoll { get { return m_ragdoll; } }
+
     private void Awake()
     {
         var enumArray = System.Enum.GetValues(typeof(GroundedStateEnum));
         IState<PlayerController>[] groundedStates = new IState<PlayerController>[enumArray.Length];
         groundedStates[(int)GroundedStateEnum.grounded] = new GroundedState();
         groundedStates[(int)GroundedStateEnum.airborne] = new AirborneState();
+        groundedStates[(int)GroundedStateEnum.ragdoll] = new RagdollState();
 
         m_groundedStateMachine = new PackagedStateMachine<PlayerController>(this, groundedStates);
 
@@ -71,7 +82,10 @@ public class PlayerController : MonoBehaviour
         GetInputs();
 
         m_groundedStateMachine.Invoke();
+    }
 
+    void UpdateMovement()
+    {
         Vector3 moveDir = m_moveInput;
         if (isGrounded)
         {
@@ -85,7 +99,7 @@ public class PlayerController : MonoBehaviour
         Vector3 moveVector = m_velocity + Vector3.up * m_verticalVelocity;
         m_currentSpeed = m_velocity.magnitude;
 
-        if(m_currentSpeed != 0.0f)
+        if (m_currentSpeed != 0.0f)
         {
             m_heading = m_velocity / m_currentSpeed;
         }
@@ -125,12 +139,25 @@ public class PlayerController : MonoBehaviour
         m_moveInput = inputReceiver.GetMovement();
     }
 
+    public void OnRagdollTriggerCollision(Collider other)
+    {
+        var otherRigid = other.GetComponent<Rigidbody>();
+        if (otherRigid != null)
+        {
+            m_groundedStateMachine.ChangeToState(GroundedStateEnum.ragdoll);
+            Vector3 vel = m_collisionTrigger.CalculateVelocity(otherRigid);
+            Debug.Log(vel);
+            m_ragdoll.GetRigidbody(0).AddForce(vel, ForceMode.Impulse);
+        }
+    }
+
     #region GroundedStates
 
     public enum GroundedStateEnum
     {
         grounded,
-        airborne
+        airborne,
+        ragdoll
     }
 
     class GroundedState : IState<PlayerController>
@@ -160,6 +187,8 @@ public class PlayerController : MonoBehaviour
                 owner.m_verticalVelocity += owner.m_gravity * Time.deltaTime;
                 owner.m_groundedStateMachine.ChangeToState(GroundedStateEnum.airborne);
             }
+
+            owner.UpdateMovement();
         }
     }
 
@@ -191,6 +220,63 @@ public class PlayerController : MonoBehaviour
             else
             {
                 owner.m_verticalVelocity += owner.m_gravity * Time.deltaTime;
+            }
+
+            owner.UpdateMovement();
+        }
+    }
+
+    class RagdollState : IState<PlayerController>
+    {
+        Rigidbody m_hips = null;
+        Transform m_hipsTransform = null;
+        Vector3 m_hipsOffset = Vector3.zero;
+
+        float m_timer = 0.0f;
+
+        void IState<PlayerController>.Enter(PlayerController owner)
+        {
+            owner.m_ragdoll.Activate(true);
+
+            m_hips = owner.m_ragdoll.GetRigidbody(0);
+            m_hipsTransform = m_hips.transform;
+
+            m_hipsOffset = m_hipsTransform.position - owner.transform.position;
+
+            m_timer = 0.0f;
+
+            owner.m_collisionTrigger.gameObject.SetActive(false);
+            owner.m_characterControl.enabled = false;
+        }
+
+        void IState<PlayerController>.Exit(PlayerController owner)
+        {
+            Vector3 targetPosition = m_hipsTransform.position;
+            owner.m_ragdoll.Activate(false);
+
+            Vector3 position = targetPosition;
+            owner.transform.position = position;
+            owner.m_characterControl.enabled = true;
+
+            owner.m_collisionTrigger.gameObject.SetActive(true);
+        }
+
+        void IState<PlayerController>.Invoke(PlayerController owner)
+        {
+            if (m_hips.velocity.magnitude < owner.m_ragdollMinSpeedThreshold)
+            {
+                m_timer += Time.deltaTime;
+                if (m_timer > owner.m_ragdollRestTime)
+                {
+                    if(owner.CheckForGroundUpdate())
+                    {
+                        owner.m_groundedStateMachine.ChangeToState(GroundedStateEnum.grounded);
+                    }
+                    else
+                    {
+                        owner.m_groundedStateMachine.ChangeToState(GroundedStateEnum.airborne);
+                    }
+                }
             }
         }
     }
