@@ -1341,6 +1341,11 @@ PrefabInstance:
       objectReference: {fileID: 1562601018}
     - target: {fileID: 6823657963641382222, guid: 628fb04ac76807f4c806824ef31542d3,
         type: 3}
+      propertyPath: m_camFollow
+      value: 
+      objectReference: {fileID: 62113207}
+    - target: {fileID: 6823657963641382222, guid: 628fb04ac76807f4c806824ef31542d3,
+        type: 3}
       propertyPath: m_cameraSpin
       value: 
       objectReference: {fileID: 881803907}

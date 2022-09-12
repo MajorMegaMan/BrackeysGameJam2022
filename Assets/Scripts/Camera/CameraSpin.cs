@@ -10,6 +10,9 @@ public class CameraSpin : MonoBehaviour
     Vector3 m_moveSmoothVel = Vector3.zero;
     [SerializeField] float m_moveSmoothTime = 0.1f;
 
+    public bool invertX = false;
+    public bool invertY = false;
+
     public float camSpeed { get { return m_camSpeed; } set { m_camSpeed = value; } }
 
     // Start is called before the first frame update
@@ -26,6 +29,11 @@ public class CameraSpin : MonoBehaviour
             Vector2 mouseInput = Vector2.zero;
             mouseInput.x = Input.GetAxisRaw("Mouse X");
             mouseInput.y = Input.GetAxisRaw("Mouse Y");
+
+            if (invertX)
+                mouseInput.x *= -1;
+            if (invertY)
+                mouseInput.y *= -1;
 
             Vector3 moveDir = transform.right * mouseInput.x * m_camSpeed;
             moveDir += transform.up * mouseInput.y * m_camSpeed;
