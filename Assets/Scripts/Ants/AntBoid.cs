@@ -409,6 +409,11 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Invoke(AntBoid owner)
         {
+            if(owner.m_navAgent.pathPending)
+            {
+                return;
+            }
+
             if(owner.m_navAgent.remainingDistance < owner.settings.buildArriveDistance)
             {
                 // arrived at build position

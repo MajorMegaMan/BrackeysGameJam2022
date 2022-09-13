@@ -15,6 +15,8 @@ public class CameraSpin : MonoBehaviour
 
     public float camSpeed { get { return m_camSpeed; } set { m_camSpeed = value; } }
 
+    public Vector3 velocity = Vector3.zero;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,5 +44,13 @@ public class CameraSpin : MonoBehaviour
 
             transform.position += m_moveSmooth;
         }
+
+        Vector3 dir = transform.localToWorldMatrix * velocity;
+        transform.position += dir * Time.deltaTime;
+    }
+
+    public void SetVelocity(Vector3 velocity)
+    {
+        this.velocity = velocity;
     }
 }

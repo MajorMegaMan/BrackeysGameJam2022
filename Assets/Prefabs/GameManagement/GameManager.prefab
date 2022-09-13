@@ -1106,6 +1106,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 262679
   m_boxShrinkDetector: 0.99
+  m_winSpinSpeed: 1.2
 --- !u!114 &4072342132166148250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1266,6 +1267,7 @@ MonoBehaviour:
   m_meshRenderer: {fileID: 4072342132950415873}
   m_validColour: {r: 0, g: 1, b: 0, a: 1}
   m_invalidColour: {r: 1, g: 0, b: 0, a: 1}
+  m_bridgeColour: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   m_coverSkinWidth: 0.1
   m_selectedAntCountCanvas: {fileID: 4072342131950549142}
   m_selectedAntCountText: {fileID: 8734027649368742971}

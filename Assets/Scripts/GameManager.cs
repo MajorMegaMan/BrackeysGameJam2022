@@ -45,6 +45,9 @@ public class GameManager : MonoBehaviour
     NavMeshPath m_startPath;
     NavMeshPath m_endPath;
 
+    [Header("Win Game")]
+    [SerializeField] float m_winSpinSpeed = 1.0f;
+
     // Singletons baby.
     static GameManager _instance = null;
     public static GameManager instance { get { return _instance; } }
@@ -175,6 +178,11 @@ public class GameManager : MonoBehaviour
         playerAudio.PlayPositiveAntSound();
         m_playerAnimate.Dance();
         m_winPanel.BeginEnter();
+        var camSpin = m_cameraFollow.GetComponent<CameraSpin>();
+        if(camSpin != null)
+        {
+            camSpin.SetVelocity(Vector3.right * m_winSpinSpeed);
+        }
     }
 
     #region SelectionStates

@@ -123,7 +123,19 @@ public class PlayerController : MonoBehaviour
         bottom += transform.position;
         top += transform.position;
 
-        return Physics.CapsuleCast(bottom, top, m_characterControl.radius, Vector3.down, out hitInfo, m_groundRayDistance + m_characterControl.skinWidth, m_groundLayer, QueryTriggerInteraction.Ignore);
+        bool castCheck = Physics.CapsuleCast(bottom, top, m_characterControl.radius, -m_groundNormal, out hitInfo, m_groundRayDistance + m_characterControl.skinWidth, m_groundLayer, QueryTriggerInteraction.Ignore);
+
+        if(castCheck)
+        {
+            float slopeDot = Vector3.Dot(Vector3.up, hitInfo.normal);
+            if(slopeDot < 0.2f)
+            {
+                // too steep
+                return false;
+            }
+        }
+
+        return castCheck;
     }
 
     // checks for ground and updates the last ground hit
@@ -146,7 +158,6 @@ public class PlayerController : MonoBehaviour
         {
             m_groundedStateMachine.ChangeToState(GroundedStateEnum.ragdoll);
             Vector3 vel = m_collisionTrigger.CalculateVelocity(otherRigid);
-            Debug.Log(vel);
             m_ragdoll.GetRigidbody(0).AddForce(vel, ForceMode.Impulse);
         }
     }
