@@ -10,6 +10,8 @@ public class BridgeCollider : MonoBehaviour
     [SerializeField] Transform m_navStart = null;
     [SerializeField] Transform m_navEnd = null;
 
+    AntBuildingGroup m_ownerGroup = null;
+
     private void Start()
     {
         EnableNavLink(false);
@@ -54,15 +56,25 @@ public class BridgeCollider : MonoBehaviour
 
     public void SetLength(float length)
     {
-        m_capsuleCollider.height = length + m_capsuleCollider.radius * 2;
+        m_capsuleCollider.height = length;// + m_capsuleCollider.radius * 2;
         Vector3 center = m_capsuleCollider.center;
-        center.y = m_capsuleCollider.height * 0.5f - m_capsuleCollider.radius;
+        center.y = m_capsuleCollider.height * 0.5f - GameManager.instance.gridManager.cellSize * 0.5f;
         m_capsuleCollider.center = center;
+    }
+
+    public void DestroyBridge()
+    {
+        // For now just destroy the object
+        Destroy(gameObject);
+    }
+
+    public void SetBuildingGroup(AntBuildingGroup antBuildingGroup)
+    {
+        m_ownerGroup = antBuildingGroup;
     }
 
     public void Disassemble()
     {
-        // For now just destroy the object
-        Destroy(gameObject);
+        m_ownerGroup.Dissassemble();
     }
 }

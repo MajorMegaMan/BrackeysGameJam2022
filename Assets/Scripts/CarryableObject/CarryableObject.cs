@@ -67,7 +67,7 @@ public class CarryableObject : MonoBehaviour
                 while(m_currentAntGroup.Count != 0)
                 {
                     // Setting the ants to wait should remove them from the ant group while also correctly removing references on their side.
-                    m_currentAntGroup[0].SetToWait();
+                    m_currentAntGroup[0].FollowPlayer(); // Refollow the player
                 }
             }
         }

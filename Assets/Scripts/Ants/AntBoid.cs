@@ -136,7 +136,7 @@ public class AntBoid : MonoBehaviour
     #endregion // !Getters
 
     // Should be called by the pick up Trigger event
-    public void PlayerPickUpTriggerEvent()
+    public void FollowPlayer()
     {
         SetState(StateEnum.following);
     }
@@ -170,7 +170,8 @@ public class AntBoid : MonoBehaviour
             }
             else
             {
-                SetState(StateEnum.empty);
+                // Refollow the player
+                FollowPlayer();
             }
         }
     }
@@ -214,7 +215,8 @@ public class AntBoid : MonoBehaviour
         if(otherRigid != null)
         {
             ActivateRagdoll();
-            m_ragdoll.GetRigidbody(0).AddForce(otherRigid.velocity, ForceMode.Impulse);
+            Vector3 vel = m_collisionTrigger.CalculateVelocity(otherRigid);
+            m_ragdoll.GetRigidbody(0).AddForce(vel, ForceMode.Impulse);
         }
     }
 
@@ -247,7 +249,6 @@ public class AntBoid : MonoBehaviour
             Vector3 toTarget = m_followTarget.position - transform.position;
             SetNavTarget(m_followTarget.position - (toTarget.normalized * settings.followDistance));
             m_navAgent.SetDestination(m_navTarget);
-
 
             if (m_navAgent.pathStatus == NavMeshPathStatus.PathPartial || m_navAgent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
@@ -408,6 +409,11 @@ public class AntBoid : MonoBehaviour
 
         void IState<AntBoid>.Invoke(AntBoid owner)
         {
+            if(owner.m_navAgent.pathPending)
+            {
+                return;
+            }
+
             if(owner.m_navAgent.remainingDistance < owner.settings.buildArriveDistance)
             {
                 // arrived at build position
@@ -447,7 +453,6 @@ public class AntBoid : MonoBehaviour
             owner.m_climbDir = lineDir;
 
             owner.m_antAnimator.Climb();
-            owner.m_antAnimator.SetHeadingYRemove(false);
 
             owner.SetNavGettersToClimb();
         }
@@ -456,7 +461,6 @@ public class AntBoid : MonoBehaviour
         {
             owner.m_antAnimator.Motion();
             owner.SetNavGettersToSelf();
-            owner.m_antAnimator.SetHeadingYRemove(true);
         }
 
         void IState<AntBoid>.Invoke(AntBoid owner)
@@ -552,7 +556,8 @@ public class AntBoid : MonoBehaviour
                 m_timer += Time.deltaTime;
                 if (m_timer > owner.settings.ragdollRestTime)
                 {
-                    owner.SetState(StateEnum.empty);
+                    // Refolloew the player
+                    owner.FollowPlayer();
                 }
             }
         }

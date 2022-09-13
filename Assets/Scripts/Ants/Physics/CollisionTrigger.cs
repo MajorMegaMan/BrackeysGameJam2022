@@ -7,6 +7,8 @@ public class CollisionTrigger : MonoBehaviour
 {
     [SerializeField] UnityEvent<Collider> m_collisionEvent;
 
+    [SerializeField] Collider m_triggerCollider;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,5 +24,10 @@ public class CollisionTrigger : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         m_collisionEvent.Invoke(other);
+    }
+
+    public Vector3 CalculateVelocity(Rigidbody rigidbody)
+    {
+        return rigidbody.GetPointVelocity(m_triggerCollider.ClosestPoint(rigidbody.position));
     }
 }
