@@ -25,6 +25,7 @@ public class TurnOffTimer : MonoBehaviour
             m_timer += Time.deltaTime;
             if(m_timer > m_time)
             {
+                targetDestroy.gameObject.layer = 0;
                 Destroy(targetDestroy);
                 Destroy(this);
             }

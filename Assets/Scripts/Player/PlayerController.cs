@@ -162,6 +162,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ForceRagdollOff()
+    {
+        if(m_groundedStateMachine.GetCurrentState() == GroundedStateEnum.ragdoll)
+        {
+            if (CheckForGroundUpdate())
+            {
+                m_groundedStateMachine.ChangeToState(GroundedStateEnum.grounded);
+            }
+            else
+            {
+                m_groundedStateMachine.ChangeToState(GroundedStateEnum.airborne);
+            }
+        }
+    }
+
     #region GroundedStates
 
     public enum GroundedStateEnum

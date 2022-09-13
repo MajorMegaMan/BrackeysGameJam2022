@@ -460,7 +460,7 @@ PrefabInstance:
     - target: {fileID: 8410137654549172602, guid: 203065f68cb03bb4f80331f6abd292d1,
         type: 3}
       propertyPath: m_onRagdollChange.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8410137654549172602, guid: 203065f68cb03bb4f80331f6abd292d1,
         type: 3}
@@ -471,11 +471,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_onRagdollChange.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 3557425001358406516}
+      objectReference: {fileID: 2161850556326527793}
     - target: {fileID: 8410137654549172602, guid: 203065f68cb03bb4f80331f6abd292d1,
         type: 3}
       propertyPath: m_onRagdollChange.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8410137654549172602, guid: 203065f68cb03bb4f80331f6abd292d1,
+        type: 3}
+      propertyPath: m_onRagdollChange.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetTimer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8410137654549172602, guid: 203065f68cb03bb4f80331f6abd292d1,
+        type: 3}
+      propertyPath: m_onRagdollChange.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AntiStuck, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8410137654549172602, guid: 203065f68cb03bb4f80331f6abd292d1,
+        type: 3}
+      propertyPath: m_onRagdollChange.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8895343026702931356, guid: 203065f68cb03bb4f80331f6abd292d1,
         type: 3}
@@ -508,3 +523,37 @@ Animator:
     type: 3}
   m_PrefabInstance: {fileID: 7347056716710890377}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &9188296468749778012 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1906887262549653461, guid: 203065f68cb03bb4f80331f6abd292d1,
+    type: 3}
+  m_PrefabInstance: {fileID: 7347056716710890377}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2161850556326527793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9188296468749778012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaeea80f8d85d6d4881920073822b47e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_stuckTime: 2
+  m_unstuckEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3557425001358406506}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: ForceRagdollOff
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

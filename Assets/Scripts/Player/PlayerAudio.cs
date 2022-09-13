@@ -27,12 +27,15 @@ public class PlayerAudio : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        m_footTimer += m_player.currentSpeed * Time.deltaTime;
-        if(m_footTimer > settings.footPlayFrequency)
+        if(m_player.isGrounded)
         {
-            m_footTimer -= settings.footPlayFrequency;
+            m_footTimer += m_player.currentSpeed * Time.deltaTime;
+            if (m_footTimer > settings.footPlayFrequency)
+            {
+                m_footTimer -= settings.footPlayFrequency;
 
-            PlayFootSound();
+                PlayFootSound();
+            }
         }
     }
 
